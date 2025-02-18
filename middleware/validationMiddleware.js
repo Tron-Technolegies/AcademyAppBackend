@@ -39,3 +39,25 @@ export const validateRegisterInput = withValidationErrors([
       if (user) throw new BadRequestError("Email already exists");
     }),
 ]);
+
+export const validateLoginInput = withValidationErrors([
+  body("email")
+    .notEmpty()
+    .withMessage("email is required")
+    .isEmail()
+    .withMessage("invalid email format"),
+  body("password").notEmpty().withMessage("password is required"),
+]);
+
+export const validateOtpInput = withValidationErrors([
+  body("otp").notEmpty().withMessage("OTP is required"),
+]);
+
+export const validateUserDetailInput = withValidationErrors([
+  body("firstName").notEmpty().withMessage("First Name is required "),
+  body("lastName").notEmpty().withMessage("Last Name is required "),
+  body("dateOfBirth").notEmpty().withMessage("Date of Birth is required "),
+  body("role").notEmpty().withMessage("role is required "),
+  body("gender").notEmpty().withMessage("gender is required "),
+  body("address").notEmpty().withMessage("address is required "),
+]);

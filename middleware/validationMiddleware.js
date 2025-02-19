@@ -61,3 +61,32 @@ export const validateUserDetailInput = withValidationErrors([
   body("gender").notEmpty().withMessage("gender is required "),
   body("address").notEmpty().withMessage("address is required "),
 ]);
+
+export const validateUpdateDetailsInput = withValidationErrors([
+  body("firstName").notEmpty().withMessage("First Name is required "),
+  body("lastName").notEmpty().withMessage("Last Name is required "),
+  body("dateOfBirth").notEmpty().withMessage("Date of Birth is required "),
+  body("email")
+    .notEmpty()
+    .withMessage("email is required")
+    .isEmail()
+    .withMessage("invalid email format")
+    .custom(async (email, { req }) => {
+      const user = await User.findOne({ email: email });
+      if (user && user._id.toString() !== req.user.userId.toString()) {
+        throw new BadRequestError("email already exists");
+      }
+    }),
+  body("gender").notEmpty().withMessage("gender is required "),
+  body("address").notEmpty().withMessage("address is required "),
+  body("phoneNumber")
+    .notEmpty()
+    .withMessage("phoneNumber is required ")
+    .custom(async (phoneNumber, { req }) => {
+      const user = await User.findOne({ phoneNumber: phoneNumber });
+      if (user && user._id.toString() !== req.user.userId.toString()) {
+        //comparing the fetched user id with the id of the person who sent this request
+        throw new BadRequestError("phone number already exists");
+      }
+    }),
+]);

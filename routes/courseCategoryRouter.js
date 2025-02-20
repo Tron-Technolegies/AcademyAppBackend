@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   addCourseCategory,
   getAllCategory,
+  getSingleCategory,
   updateCategory,
 } from "../controllers/courseCategoryController.js";
 import { isAdmin } from "../middleware/authenticationMiddleware.js";
@@ -16,4 +17,5 @@ router.patch(
   isAdmin,
   updateCategory
 );
+router.get("/getCategories/:id", isAdmin, getSingleCategory);
 export default router;

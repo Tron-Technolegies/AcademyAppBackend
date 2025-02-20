@@ -25,3 +25,16 @@ export const updateCategory = async (req, res) => {
   await category.save();
   res.status(200).json({ message: "category is updated" });
 };
+export const getSingleCategory = async (req, res) => {
+  const { id } = req.params;
+  const category = await Category.findById(id);
+  if (!category) throw new NotFoundError("category not found");
+  res.status(200).json(category);
+};
+
+export const deleteCategory = async (req, res) => {
+  const { id } = req.params;
+  const category = await Category.findByIdAndDelete(id);
+  if (!category) throw new NotFoundError("category not found");
+  res.status(200).json({ message: "successfully deleted" });
+};

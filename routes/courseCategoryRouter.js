@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   addCourseCategory,
+  deleteCategory,
   getAllCategory,
   getSingleCategory,
   updateCategory,
@@ -18,4 +19,5 @@ router.patch(
   updateCategory
 );
 router.get("/getCategories/:id", isAdmin, getSingleCategory);
+router.delete("/deleteCategory/:id", isAdmin, deleteCategory);
 export default router;

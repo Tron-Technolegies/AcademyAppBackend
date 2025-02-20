@@ -34,6 +34,9 @@ const UserSchema = new Schema(
       default: "student",
       enum: ["student", "teacher", "admin"], //only values from these array are accepted
     },
+    status: {
+      type: String,
+    },
 
     otp: { type: String },
 

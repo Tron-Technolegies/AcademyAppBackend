@@ -1,12 +1,4 @@
 import mongoose, { model, Schema } from "mongoose";
-const InstructorSchema = new Schema({
-  name: String,
-  role: String,
-  rating: Number,
-  students: Number,
-  course: String,
-  minutes: Number,
-});
 
 const CourseSchema = new Schema(
   {
@@ -16,9 +8,11 @@ const CourseSchema = new Schema(
     },
     courseCategory: {
       type: mongoose.Types.ObjectId,
+      ref: "Category",
     },
     instructor: {
-      type: InstructorSchema,
+      type: mongoose.Types.ObjectId,
+      ref: "Instructor",
     },
     courseRating: {
       type: Number,

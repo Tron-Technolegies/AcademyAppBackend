@@ -94,3 +94,20 @@ export const validateUpdateDetailsInput = withValidationErrors([
 export const validateCategoryInput = withValidationErrors([
   body("categoryName").notEmpty().withMessage("Category name is required"),
 ]);
+
+export const validateCourseInput = withValidationErrors([
+  body("courseName").notEmpty().withMessage("course name is required"),
+  body("courseCategory").notEmpty().withMessage("course category is required"),
+  body("instructor").notEmpty().withMessage("instructor is required"),
+  body("courseOverView").notEmpty().withMessage("courseOverView is required"),
+]);
+
+export const validateInstructorInput = withValidationErrors([
+  body("instructorName").notEmpty().withMessage("instructor name is required"),
+  body("instructorRole").notEmpty().withMessage("instructor role is required"),
+]);
+
+export const validateModuleInput = withValidationErrors([
+  body("moduleName").notEmpty().withMessage("module name is required"),
+  body("relatedCourse").notEmpty().withMessage(" related course is required"),
+]);

@@ -9,7 +9,7 @@ export const addUserDetails = async (req, res) => {
   user.firstName = firstName;
   user.lastName = lastName;
   user.dateOfBirth = new Date(`${year}-${month}-${day}T00:00:00Z`);
-  user.role = role;
+  user.status = role;
   user.gender = gender;
 
   user.address = address;

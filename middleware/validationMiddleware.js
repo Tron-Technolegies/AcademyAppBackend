@@ -90,3 +90,7 @@ export const validateUpdateDetailsInput = withValidationErrors([
       }
     }),
 ]);
+
+export const validateCategoryInput = withValidationErrors([
+  body("categoryName").notEmpty().withMessage("Category name is required"),
+]);

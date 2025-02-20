@@ -76,3 +76,4 @@ export const verifyOtp = async (req, res) => {
     res.status(200).json({ message: "Successfully verified" });
   } else throw new UnauthenticatedError("Invalid otp");
 };
+

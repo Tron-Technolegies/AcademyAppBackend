@@ -29,10 +29,19 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
+    profilePicUrl: {
+      type: String,
+    },
+    profilePicPublicId: {
+      type: String,
+    },
     role: {
       type: String,
       default: "student",
       enum: ["student", "teacher", "admin"], //only values from these array are accepted
+    },
+    status: {
+      type: String,
     },
 
     otp: { type: String },

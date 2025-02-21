@@ -29,6 +29,12 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
+    profilePicUrl: {
+      type: String,
+    },
+    profilePicPublicId: {
+      type: String,
+    },
     role: {
       type: String,
       default: "student",

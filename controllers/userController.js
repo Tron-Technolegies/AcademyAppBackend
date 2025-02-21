@@ -1,5 +1,7 @@
-import { NotFoundError } from "../errors/customErrors.js";
+import { BadRequestError, NotFoundError } from "../errors/customErrors.js";
+import { formatImage } from "../middleware/multerMiddleware.js";
 import User from "../models/UserModel.js";
+import { v2 as cloudinary } from "cloudinary";
 
 export const addUserDetails = async (req, res) => {
   const { firstName, lastName, dateOfBirth, role, gender, address } = req.body;
@@ -46,4 +48,23 @@ export const updateUserDetails = async (req, res) => {
   user.address = address;
   await user.save();
   res.status(200).json({ message: "successfully updated" });
+};
+
+export const updateProfilePic = async (req, res) => {
+  //code for updating profile pic
+  const user = await User.findById(req.user.userId);
+  if (!user) throw new NotFoundError("user not found");
+  if (req.file) {
+    const file = formatImage(req.file); //extracting the buffer file into image
+    if (user.profilePicPublicId) {
+      await cloudinary.uploader.destroy(user.profilePicPublicId); //deleting current profile pic
+    }
+    const response = await cloudinary.uploader.upload(file);
+    user.profilePicUrl = response.secure_url; //storing the new url from cloudinary into the users data base
+    user.profilePicPublicId = response.public_id; //storing the new public id from cloudinary into the user database
+    await user.save();
+    res
+      .status(200)
+      .json({ message: "successfully updated", url: user.profilePicUrl });
+  } else throw new BadRequestError("no files found");
 };

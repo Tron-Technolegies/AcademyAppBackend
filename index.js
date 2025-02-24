@@ -9,12 +9,17 @@ import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 import { v2 as cloudinary } from "cloudinary";
 
+//router imports
 import authRouter from "./routes/authRouter.js";
 import userRouter from "./routes/userRouter.js";
 import courseCategoryRouter from "./routes/courseCategoryRouter.js";
 import courseRouter from "./routes/courseRouter.js";
-import InstructorRouter from "./routes/instructorRouter.js";
-import ModuleRouter from "./routes/moduleRouter.js";
+import instructorRouter from "./routes/instructorRouter.js";
+import moduleRouter from "./routes/moduleRouter.js";
+import communityRouter from "./routes/communityRouter.js";
+import videoRouter from "./routes/videoRouter.js";
+import subCommunityRouter from "./routes/subCommunityRouter.js";
+//custom middleware imports
 import errorHandlerMiddleware from "./middleware/errorHandlerMiddleware.js";
 import { authenticateUser } from "./middleware/authenticationMiddleware.js";
 
@@ -41,8 +46,11 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", authenticateUser, userRouter);
 app.use("/api/v1/category", authenticateUser, courseCategoryRouter);
 app.use("/api/v1/course", authenticateUser, courseRouter);
-app.use("/api/v1/instructor", authenticateUser, InstructorRouter);
-app.use("/api/v1/module", authenticateUser, ModuleRouter);
+app.use("/api/v1/instructor", authenticateUser, instructorRouter);
+app.use("/api/v1/module", authenticateUser, moduleRouter);
+app.use("/api/v1/community", authenticateUser, communityRouter);
+app.use("/api/v1/video", authenticateUser, videoRouter);
+app.use("/api/v1/subCommunity", authenticateUser, subCommunityRouter);
 
 app.use("*", (req, res) => {
   res.status(404).json({ message: "not found" }); //this error will trigger when the request route do not match any of the above routes

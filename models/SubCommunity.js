@@ -5,6 +5,10 @@ const SubCommunitySchema = new Schema(
     subCommunityName: {
       type: String,
     },
+    relatedCommunity: {
+      type: mongoose.Types.ObjectId,
+      ref: "Community",
+    },
     subCommunityMembers: [
       {
         type: mongoose.Types.ObjectId,

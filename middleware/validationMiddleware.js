@@ -131,3 +131,11 @@ export const validateSubCommunityInput = withValidationErrors([
     .notEmpty()
     .withMessage(" related community is not found"),
 ]);
+
+export const validateClassInput = withValidationErrors([
+  body("className").notEmpty().withMessage("class is not found"),
+  body("date").notEmpty().withMessage("date is required"),
+  body("time").notEmpty().withMessage("time is required"),
+  body("instructor").notEmpty().withMessage("instructor is required"),
+  body("course").notEmpty().withMessage("course is requires "),
+]);

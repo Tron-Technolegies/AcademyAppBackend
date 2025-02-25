@@ -1,5 +1,4 @@
 import mongoose, { model, Schema } from "mongoose";
-import Course from "./CourseModel";
 
 const ClassSchema = new Schema(
   {

@@ -19,6 +19,7 @@ import moduleRouter from "./routes/moduleRouter.js";
 import communityRouter from "./routes/communityRouter.js";
 import videoRouter from "./routes/videoRouter.js";
 import subCommunityRouter from "./routes/subCommunityRouter.js";
+import classRouter from "./routes/classRouter.js";
 //custom middleware imports
 import errorHandlerMiddleware from "./middleware/errorHandlerMiddleware.js";
 import { authenticateUser } from "./middleware/authenticationMiddleware.js";
@@ -51,6 +52,7 @@ app.use("/api/v1/module", authenticateUser, moduleRouter);
 app.use("/api/v1/community", authenticateUser, communityRouter);
 app.use("/api/v1/video", authenticateUser, videoRouter);
 app.use("/api/v1/subCommunity", authenticateUser, subCommunityRouter);
+app.use("/api/v1/class", authenticateUser, classRouter);
 
 app.use("*", (req, res) => {
   res.status(404).json({ message: "not found" }); //this error will trigger when the request route do not match any of the above routes

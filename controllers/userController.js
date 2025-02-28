@@ -68,3 +68,23 @@ export const updateProfilePic = async (req, res) => {
       .json({ message: "successfully updated", url: user.profilePicUrl });
   } else throw new BadRequestError("no files found");
 };
+
+export const saveVideo = async (req, res) => {
+  const user = await User.findById(req.user.userId);
+  if (!user) throw new NotFoundError("user not found");
+  user.saved.push(req.body.id);
+  await user.save();
+  res.status(200).json({ message: "successfully saved" });
+};
+
+export const unSaveVideo = async (req, res) => {
+  const user = await User.findById(req.user.userId);
+  if (!user) throw new NotFoundError("user not found");
+  const allVideos = user.saved;
+  const newVideos = allVideos.filter((video) => {
+    return video !== req.body.id;
+  });
+  user.saved = newVideos;
+  await user.save();
+  res.status(200).json({ message: "unsaved successfully" });
+};

@@ -11,11 +11,7 @@ const VideoSchema = new Schema(
       type: String,
       required: true,
     },
-    videoPublicId: {
-      //used for updating video in cloudinary
-      type: String,
-      required: true,
-    },
+
     relatedModule: {
       type: mongoose.Types.ObjectId,
       ref: "Module",

@@ -111,3 +111,39 @@ export const validateModuleInput = withValidationErrors([
   body("moduleName").notEmpty().withMessage("module name is required"),
   body("relatedCourse").notEmpty().withMessage(" related course is required"),
 ]);
+
+export const validateCommunityInput = withValidationErrors([
+  body("communityName").notEmpty().withMessage("community is not found"),
+]);
+
+export const validateVideoInput = withValidationErrors([
+  body("videoName").notEmpty().withMessage("video name is not found"),
+  body("videoURL").notEmpty().withMessage("video url is not found"),
+  body("relatedModule").notEmpty().withMessage(" related module is required"),
+  body("relatedCourse").notEmpty().withMessage("related course is required"),
+]);
+
+export const validateSubCommunityInput = withValidationErrors([
+  body("subCommunityName")
+    .notEmpty()
+    .withMessage(" sub community is not found"),
+  body("relatedCommunity")
+    .notEmpty()
+    .withMessage(" related community is not found"),
+]);
+
+export const validateClassInput = withValidationErrors([
+  body("className").notEmpty().withMessage("class is not found"),
+  body("date").notEmpty().withMessage("date is required"),
+  body("time").notEmpty().withMessage("time is required"),
+  body("instructor").notEmpty().withMessage("instructor is required"),
+  body("course").notEmpty().withMessage("course is requires "),
+]);
+
+export const validateSaveVideoInput = withValidationErrors([
+  body("id")
+    .notEmpty()
+    .withMessage("id is not required")
+    .isMongoId()
+    .withMessage("invalid id"),
+]);

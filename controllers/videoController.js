@@ -46,7 +46,7 @@ export const deleteVideo = async (req, res) => {
   res.status(200).json({ message: "successfully deleted" });
 };
 export const getVideoByCourse = async (req, res) => {
-  //we are passing the courseId through body
+  //we are passing the courseId through query
   const { courseId } = req.query;
   const videos = await Video.find({ relatedCourse: courseId }); //we are filtering all the videos related to course,
   if (!videos) throw new NotFoundError("videos not found");

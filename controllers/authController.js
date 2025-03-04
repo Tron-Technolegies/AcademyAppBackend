@@ -3,9 +3,10 @@ import {
   NotFoundError,
   UnauthenticatedError,
 } from "../errors/customErrors.js";
+import { redisClient } from "../middleware/authenticationMiddleware.js";
 import User from "../models/UserModel.js";
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
-import { createJWT } from "../utils/jwtUtils.js";
+import { createJWT, verifyJWT } from "../utils/jwtUtils.js";
 import { sendMail, transporter } from "../utils/nodemailer.js";
 
 export const registerUser = async (req, res) => {
@@ -77,3 +78,10 @@ export const verifyOtp = async (req, res) => {
   } else throw new UnauthenticatedError("Invalid otp");
 };
 
+export const logout = async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1] || req.cookies.token;
+  if (!token) throw new UnauthenticatedError("unable to access");
+  const decoded = verifyJWT(token);
+  decoded.exp = Date.now();
+  return res.status(200).json({ message: "Logged out successfully " });
+};

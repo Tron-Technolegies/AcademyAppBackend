@@ -45,3 +45,17 @@ export const deleteVideo = async (req, res) => {
   if (!video) throw new NotFoundError("videos not found");
   res.status(200).json({ message: "successfully deleted" });
 };
+export const getVideoByCourse = async (req, res) => {
+  //we are passing the courseId through body
+  const { courseId } = req.body;
+  const videos = await Video.find({ relatedCourse: courseId }); //we are filtering all the videos related to course,
+  if (!videos) throw new NotFoundError("videos not found");
+  res.status(200).json(videos);
+};
+
+export const getVideoByModule = async (req, res) => {
+  const { moduleId } = req.body;
+  const videos = await Video.find({ relatedModule: moduleId });
+  if (!videos) throw new NotFoundError("videos not found ");
+  res.status(200).json(videos);
+};

@@ -149,5 +149,13 @@ export const validateSaveVideoInput = withValidationErrors([
 ]);
 
 export const validateModuleByCourseInput = withValidationErrors([
-  body("courseId").notEmpty().withMessage("courseId is required"),
+  body("courseId").notEmpty().withMessage("course id is required"),
+]);
+
+export const validateVideoByCourseInput = withValidationErrors([
+  body("courseId").notEmpty().withMessage("course id is required"),
+]);
+
+export const validateVideoByModuleInput = withValidationErrors([
+  body("moduleId").notEmpty().withMessage("module id is requires"),
 ]);

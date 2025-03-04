@@ -45,3 +45,10 @@ export const deleteCourse = async (req, res) => {
   if (!course) throw new NotFoundError("course not found");
   res.status(200).json({ message: "deleted successfully" });
 };
+
+export const getCourseByCategory = async (req, res) => {
+  const { categoryId } = req.query;
+  const course = await Course.find({ courseCategory: categoryId });
+  if (!course) throw new NotFoundError("course not found");
+  res.status(200).json(course);
+};

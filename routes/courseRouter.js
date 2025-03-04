@@ -3,6 +3,7 @@ import {
   addCourse,
   deleteCourse,
   getAllCourse,
+  getCourseByCategory,
   getSingleCourse,
   updateCourse,
 } from "../controllers/courseController.js";
@@ -15,5 +16,6 @@ router.get("/getCourse", getAllCourse);
 router.patch("/updateCourse/:id", validateCourseInput, isAdmin, updateCourse);
 router.get("/getCourse/:id", getSingleCourse);
 router.delete("/deleteCourse/:id", isAdmin, deleteCourse);
+router.get("/getCourseByCategory", getCourseByCategory);
 
 export default router;

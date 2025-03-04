@@ -43,7 +43,7 @@ export const deleteModule = async (req, res) => {
 };
 
 export const getModuleByCourse = async (req, res) => {
-  const { courseId } = req.body;
+  const { courseId } = req.query;
   const modules = await Module.find({ relatedCourse: courseId });
   if (!modules) throw new NotFoundError("module not found");
   res.status(200).json(modules);

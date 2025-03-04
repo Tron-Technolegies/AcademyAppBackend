@@ -14,7 +14,7 @@ export const addCourse = async (req, res) => {
 };
 
 export const getAllCourse = async (req, res) => {
-  const courses = await Course.find();
+  const courses = await Course.find().populate("instructor");
   if (!courses) throw new NotFoundError("course not found");
   res.status(200).json(courses);
 };

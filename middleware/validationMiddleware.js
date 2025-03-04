@@ -147,3 +147,7 @@ export const validateSaveVideoInput = withValidationErrors([
     .isMongoId()
     .withMessage("invalid id"),
 ]);
+
+export const validateModuleByCourseInput = withValidationErrors([
+  body("courseId").notEmpty().withMessage("courseId is required"),
+]);

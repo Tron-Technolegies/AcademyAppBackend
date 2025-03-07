@@ -1,5 +1,6 @@
 import { NotFoundError } from "../errors/customErrors.js";
 import Video from "../models/VideoModel.js";
+import Module from "../models/ModuleModel.js";
 
 export const addVideo = async (req, res) => {
   const { videoName, videoURL, relatedModule, relatedCourse } = req.body;
@@ -10,6 +11,12 @@ export const addVideo = async (req, res) => {
     relatedCourse: relatedCourse,
   });
   await newVideo.save();
+
+  const module = await Module.findById(relatedModule);
+  if (!module) throw new NotFoundError("modules not found");
+  module.AllVideos.push(newVideo._id);
+  await module.save();
+
   res.status(201).json({ message: "successfully created" });
 };
 
@@ -41,10 +48,20 @@ export const getSingleVideo = async (req, res) => {
 
 export const deleteVideo = async (req, res) => {
   const { id } = req.params;
-  const video = await Video.findByIdAndDelete(id);
-  if (!video) throw new NotFoundError("videos not found");
-  res.status(200).json({ message: "successfully deleted" });
+  const video = await Video.findById(id);
+  if (!video) throw new NotFoundError("No video found");
+  const module = await Module.findById(video.relatedModule);
+  if (!module) throw new NotFoundError("No Module found");
+  const allVideos = module.AllVideos;
+  const newVideos = allVideos.filter(
+    (video) => video.toString() !== video._id.toString()
+  );
+  module.AllVideos = newVideos;
+  await module.save();
+  await Video.findByIdAndDelete(id);
+  res.status(200).json({ msg: "Video has successfully deleted" });
 };
+
 export const getVideoByCourse = async (req, res) => {
   //we are passing the courseId through query
   const { courseId } = req.query;

@@ -44,7 +44,13 @@ export const deleteModule = async (req, res) => {
 
 export const getModuleByCourse = async (req, res) => {
   const { courseId } = req.query;
+
+  // Find modules related to the given courseId
   const modules = await Module.find({ relatedCourse: courseId });
-  if (!modules) throw new NotFoundError("module not found");
+
+  if (!modules || modules.length === 0) {
+    throw new NotFoundError("Module not found");
+  }
+
   res.status(200).json(modules);
 };

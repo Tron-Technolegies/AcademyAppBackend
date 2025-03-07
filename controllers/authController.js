@@ -3,10 +3,10 @@ import {
   NotFoundError,
   UnauthenticatedError,
 } from "../errors/customErrors.js";
-import { redisClient } from "../middleware/authenticationMiddleware.js";
+import jwt from "jsonwebtoken";
 import User from "../models/UserModel.js";
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
-import { createJWT, verifyJWT } from "../utils/jwtUtils.js";
+import { createJWT } from "../utils/jwtUtils.js";
 import { sendMail, transporter } from "../utils/nodemailer.js";
 
 export const registerUser = async (req, res) => {
@@ -79,9 +79,18 @@ export const verifyOtp = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-  const token = req.headers.authorization?.split(" ")[1] || req.cookies.token;
-  if (!token) throw new UnauthenticatedError("unable to access");
-  const decoded = verifyJWT(token);
-  decoded.exp = Date.now();
-  return res.status(200).json({ message: "Logged out successfully " });
+  // const token = req.headers.authorization?.split(" ")[1] || req.cookies.token;
+  // if (!token) throw new UnauthenticatedError("unable to access");
+  // const decoded = verifyJWT(token);
+  // decoded.exp = Date.now();
+  const token = jwt.sign({ userId: "logout" }, process.env.JWT_SECRET, {
+    expiresIn: "1s",
+  });
+  const tenDay = 1000 * 60 * 60 * 24 * 10;
+  res.cookie("token", token, {
+    httpOnly: true,
+    expires: new Date(Date.now() + tenDay),
+    secure: process.env.NODE_ENV === "production",
+  });
+  res.status(200).json({ message: "Logged out successfully ", token });
 };

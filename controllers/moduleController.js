@@ -52,5 +52,5 @@ export const getModuleByCourse = async (req, res) => {
     throw new NotFoundError("Module not found");
   }
 
-  res.status(200).json(modulesWithVideoCount);
+  res.status(200).json(modules);
 };

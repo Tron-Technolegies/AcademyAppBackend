@@ -82,9 +82,43 @@ export const unSaveVideo = async (req, res) => {
   if (!user) throw new NotFoundError("user not found");
   const allVideos = user.saved;
   const newVideos = allVideos.filter((video) => {
-    return video !== req.body.id;
+    return video.toString() !== req.body.id.toString();
   });
   user.saved = newVideos;
   await user.save();
   res.status(200).json({ message: "unsaved successfully" });
+};
+
+export const addToHistory = async (req, res) => {
+  const user = await User.findById(req.user.userId);
+  if (!user) throw new NotFoundError("user not found");
+  const allVideos = user.history; //here history is an array that created in user model
+  const newVideos = allVideos.filter((video) => {
+    //to check video(id) not equal to  videos(id) in the history.
+    return video.toString() !== req.body.id.toString();
+  });
+  user.history = newVideos;
+  user.history.push(req.body.id);
+  await user.save();
+  res.status(200).json({ message: "successfully added" });
+};
+
+export const clearHistory = async (req, res) => {
+  const user = await User.findById(req.user.userId);
+  if (!user) throw new NotFoundError("user not found");
+  user.history = [];
+  await user.save();
+  res.status(200).json({ message: "successfully cleared" });
+};
+
+export const removeFromHistory = async (req, res) => {
+  const user = await User.findById(req.user.userId);
+  if (!user) throw new NotFoundError("user not found");
+  const allVideos = user.history;
+  const newVideos = allVideos.filter((video) => {
+    return video.toString() !== req.body.id.toString();
+  });
+  user.history = newVideos;
+  await user.save();
+  res.status(200).json({ message: "deleted successfully" });
 };

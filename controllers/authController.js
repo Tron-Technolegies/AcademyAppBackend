@@ -8,9 +8,7 @@ import User from "../models/UserModel.js";
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { createJWT } from "../utils/jwtUtils.js";
 import { sendMail, transporter } from "../utils/nodemailer.js";
-// import { loadModels } from "../utils/faceModel.js";
-// import * as faceapi from "@vladmandic/face-api";
-// import fs from "fs";
+import { compareFaces } from "../utils/faceModel.js";
 
 export const registerUser = async (req, res) => {
   const { email, password, phoneNumber } = req.body; //to access the items sent from front-end
@@ -98,20 +96,28 @@ export const logout = async (req, res) => {
   res.status(200).json({ message: "Logged out successfully ", token });
 };
 
-// export const faceRecognition = async (req, res) => {
-//   if (!req.file) throw new BadRequestError("no image found");
-//   await loadModels();
-//   const image = await faceapi.bufferToImage(fs.readFileSync(req.file.path));
-//   const faceDescriptor = await faceapi
-//     .detectSingleFace(image)
-//     .withFaceLandmarks()
-//     .withFaceDescriptor();
+export const saveFace = async (req, res) => {
+  const user = await User.findById(req.user.userId);
+  if (!user) throw new NotFoundError("user not found");
+  const imageBuffer = req.file.buffer;
+  const base64Image = imageBuffer.toString("base64");
+  user.faceEmbeddings = base64Image;
+  await user.save();
+  res.status(200).json({ message: "face saved successfully" });
+};
 
-//   if (!faceDescriptor) throw new BadRequestError("no face detected");
-//   const user = await User.findById(req.user.userId);
-//   if (!user) throw new NotFoundError("user not found");
-//   user.faceEmbeddings = faceDescriptor.descriptor;
-//   await user.save();
-//   fs.unlinkSync(req.file.path);
-//   res.status(200).json({ message: "face recognition completed " });
-// };
+export const compareFace = async (req, res) => {
+  const user = await User.findById(req.user.userId);
+  if (!user) throw new NotFoundError("user not found");
+  const imageBuffer = req.file.buffer;
+  const newImageBase64 = imageBuffer.toString("base64");
+
+  const isMatch = await compareFaces(user.faceEmbeddings, newImageBase64);
+  console.log(isMatch);
+
+  if (isMatch) {
+    res.status(200).json({ message: "face verification successfullllll" });
+  } else {
+    res.status(401).json({ message: "oops!!" });
+  }
+};

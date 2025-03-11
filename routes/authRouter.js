@@ -1,9 +1,11 @@
 import { Router } from "express";
 import {
+  compareFace,
   // faceRecognition,
   loginUser,
   logout,
   registerUser,
+  saveFace,
   verifyOtp,
 } from "../controllers/authController.js";
 import {
@@ -19,10 +21,12 @@ router.post("/register", validateRegisterInput, registerUser);
 router.post("/login", validateLoginInput, loginUser);
 router.post("/verify", validateOtpInput, authenticateUser, verifyOtp);
 router.post("/logout", logout);
-// router.post(
-//   "/registerFace",
-//   authenticateUser,
-//   upload.single("face"),
-//   faceRecognition
-// );
+router.patch("/addFace", authenticateUser, upload.single("face"), saveFace);
+router.patch(
+  "/verifyFace",
+  authenticateUser,
+  upload.single("face"),
+  compareFace
+);
+
 export default router;

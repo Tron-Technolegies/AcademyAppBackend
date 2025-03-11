@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 import { v2 as cloudinary } from "cloudinary";
+import faceapi from "face-api.js";
 
 //router imports
 import authRouter from "./routes/authRouter.js";
@@ -37,6 +38,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.resolve(_dirname, "./public")));
+
+async function loadModels() {
+  await faceapi.nets.ssdMobilenetv1.loadFromDisk(
+    path.join(_dirname, "models/weights")
+  );
+  await faceapi.nets.faceLandmark68Net.loadFromDisk("./models/weights");
+  await faceapi.nets.faceRecognitionNet.loadFromDisk("./models/weights");
+}
+loadModels();
 
 app.get("/", (req, res) => {
   res.sendFile("index.html");

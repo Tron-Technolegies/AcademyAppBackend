@@ -8,6 +8,7 @@ import User from "../models/UserModel.js";
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { createJWT } from "../utils/jwtUtils.js";
 import { sendMail, transporter } from "../utils/nodemailer.js";
+import { compareFaces } from "../utils/faceModel.js";
 
 export const registerUser = async (req, res) => {
   const { email, password, phoneNumber } = req.body; //to access the items sent from front-end
@@ -93,4 +94,39 @@ export const logout = async (req, res) => {
     secure: process.env.NODE_ENV === "production",
   });
   res.status(200).json({ message: "Logged out successfully ", token });
+};
+
+export const saveFace = async (req, res) => {
+  //code for face recognition to add face
+  const user = await User.findById(req.user.userId);
+  if (!user) throw new NotFoundError("user not found");
+  const imageBuffer = req.file.buffer; //we get id from the buffer file , it is in different format
+  const base64Image = imageBuffer.toString("base64"); //coverting to string
+  user.faceEmbeddings = base64Image; //store it in the faceembeddings.
+  await user.save();
+  res.status(200).json({ message: "face saved successfully" });
+};
+
+export const compareFace = async (req, res) => {
+  //code to compare face.
+  const user = await User.findById(req.user.userId);
+  if (!user) throw new NotFoundError("user not found");
+  const imageBuffer = req.file.buffer;
+  const newImageBase64 = imageBuffer.toString("base64");
+
+  const isMatch = await compareFaces(user.faceEmbeddings, newImageBase64);
+  console.log(isMatch);
+
+  if (isMatch) {
+    const token = createJWT({ userId: user._id, role: user.role });
+    const tenDay = 1000 * 60 * 60 * 24 * 10;
+    res.cookie("token", token, {
+      httpOnly: true,
+      expires: new Date(Date.now() + tenDay),
+      secure: process.env.NODE_ENV === "production",
+    });
+    res.status(200).json({ message: "face verification successful", token });
+  } else {
+    res.status(401).json({ message: "verification failed" });
+  }
 };

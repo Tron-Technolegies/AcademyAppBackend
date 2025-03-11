@@ -1,8 +1,11 @@
 import { Router } from "express";
 
 import {
+  addToHistory,
   addUserDetails,
+  clearHistory,
   getUserInfo,
+  removeFromHistory,
   saveVideo,
   unSaveVideo,
   updateProfilePic,
@@ -21,6 +24,9 @@ router.get("/userInfo", getUserInfo);
 router.patch("/updateDetails", validateUpdateDetailsInput, updateUserDetails);
 router.patch("/updatePic", upload.single("profilePic"), updateProfilePic);
 router.patch("/saveVideo", validateSaveVideoInput, saveVideo);
-router.patch("/unsaveVideo", validateSaveVideoInput, unSaveVideo);
+router.patch("/unSaveVideo", validateSaveVideoInput, unSaveVideo);
+router.patch("/addToHistory", validateSaveVideoInput, addToHistory);
+router.patch("/clearHistory", clearHistory);
+router.patch("/removeFromHistory", validateSaveVideoInput, removeFromHistory);
 
 export default router;

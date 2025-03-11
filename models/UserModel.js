@@ -47,7 +47,7 @@ const UserSchema = new Schema(
     otp: { type: String },
 
     faceEmbeddings: {
-      type: [Number], //faceEmbeddings will be array of numbers
+      type: String,
     },
 
     firstName: String,

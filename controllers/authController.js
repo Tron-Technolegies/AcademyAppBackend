@@ -125,7 +125,7 @@ export const compareFace = async (req, res) => {
       expires: new Date(Date.now() + tenDay),
       secure: process.env.NODE_ENV === "production",
     });
-    res.status(200).json({ message: "face verification successful" });
+    res.status(200).json({ message: "face verification successful", token });
   } else {
     res.status(401).json({ message: "verification failed" });
   }

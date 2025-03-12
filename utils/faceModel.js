@@ -1,6 +1,14 @@
 import faceapi from "face-api.js";
 import { Canvas, Image, loadImage } from "canvas";
 
+async function loadModels() {
+  await faceapi.nets.ssdMobilenetv1.loadFromDisk(
+    path.join(_dirname, "models/weights")
+  );
+  await faceapi.nets.faceLandmark68Net.loadFromDisk("./models/weights");
+  await faceapi.nets.faceRecognitionNet.loadFromDisk("./models/weights");
+}
+
 faceapi.env.monkeyPatch({ Canvas, Image });
 
 async function compareFaces(image1Base64, image2Base64) {
@@ -26,4 +34,4 @@ async function compareFaces(image1Base64, image2Base64) {
 
   return distance < 0.4;
 }
-export { compareFaces };
+export { compareFaces, loadModels };

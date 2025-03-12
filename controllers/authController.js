@@ -115,17 +115,9 @@ export const compareFace = async (req, res) => {
   const newImageBase64 = imageBuffer.toString("base64");
 
   const isMatch = await compareFaces(user.faceEmbeddings, newImageBase64);
-  console.log(isMatch);
 
   if (isMatch) {
-    const token = createJWT({ userId: user._id, role: user.role });
-    const tenDay = 1000 * 60 * 60 * 24 * 10;
-    res.cookie("token", token, {
-      httpOnly: true,
-      expires: new Date(Date.now() + tenDay),
-      secure: process.env.NODE_ENV === "production",
-    });
-    res.status(200).json({ message: "face verification successful", token });
+    res.status(200).json({ message: "face verification successful" });
   } else {
     res.status(401).json({ message: "verification failed" });
   }

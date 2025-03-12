@@ -8,7 +8,7 @@ import User from "../models/UserModel.js";
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { createJWT } from "../utils/jwtUtils.js";
 import { sendMail, transporter } from "../utils/nodemailer.js";
-import { compareFaces } from "../utils/faceModel.js";
+import { compareFaces, loadModels } from "../utils/faceModel.js";
 
 export const registerUser = async (req, res) => {
   const { email, password, phoneNumber } = req.body; //to access the items sent from front-end
@@ -111,6 +111,7 @@ export const compareFace = async (req, res) => {
   //code to compare face.
   const user = await User.findById(req.user.userId);
   if (!user) throw new NotFoundError("user not found");
+  await loadModels();
   const imageBuffer = req.file.buffer;
   const newImageBase64 = imageBuffer.toString("base64");
 
@@ -121,4 +122,31 @@ export const compareFace = async (req, res) => {
   } else {
     res.status(401).json({ message: "verification failed" });
   }
+};
+
+export const sendResetPassword = async (req, res) => {
+  const { id } = req.params;
+  res.render("resetPassword.ejs", { userId: id });
+};
+
+export const forgotPassword = async (req, res) => {
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) throw new NotFoundError("user not found");
+  const mailOptions = {
+    from: {
+      name: "Tron Academy App",
+      address: process.env.NODEMAILER_EMAIL,
+    },
+    to: user.email, //sending email to newUser
+    subject: "reset password",
+    text: `You have requested a password reset for your Tron Academy account. You can reset your password in the following link.
+    http://localhost:3000/api/v1/auth/resetPassword/${user.id}`,
+  };
+
+  await sendMail(transporter, mailOptions);
+  res.status(200).json({ message: "link has been sent to your email" });
+};
+
+export const resetPassword = async (req, res) => {
+  console.log(req.body);
 };

@@ -1,14 +1,18 @@
 import { Router } from "express";
 import {
   compareFace,
+  forgotPassword,
   // faceRecognition,
   loginUser,
   logout,
   registerUser,
+  resetPassword,
   saveFace,
+  sendResetPassword,
   verifyOtp,
 } from "../controllers/authController.js";
 import {
+  validateForgotPasswordInput,
   validateLoginInput,
   validateOtpInput,
   validateRegisterInput,
@@ -28,5 +32,8 @@ router.patch(
   upload.single("face"),
   compareFace
 );
+router.get("/resetPassword/:id", sendResetPassword);
+router.post("/forgotPassword", validateForgotPasswordInput, forgotPassword);
+router.post("/forgotPassword/:id", resetPassword);
 
 export default router;

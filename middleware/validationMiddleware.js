@@ -147,3 +147,7 @@ export const validateSaveVideoInput = withValidationErrors([
     .isMongoId()
     .withMessage("invalid id"),
 ]);
+
+export const validateForgotPasswordInput = withValidationErrors([
+  body("email").notEmpty().withMessage("email is required"),
+]);

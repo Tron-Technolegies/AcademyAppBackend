@@ -16,6 +16,7 @@ import {
   validateLoginInput,
   validateOtpInput,
   validateRegisterInput,
+  validateResetPasswordInput,
 } from "../middleware/validationMiddleware.js";
 import { authenticateUser } from "../middleware/authenticationMiddleware.js";
 import upload from "../middleware/multerMiddleware.js";
@@ -34,6 +35,6 @@ router.patch(
 );
 router.get("/resetPassword/:id", sendResetPassword);
 router.post("/forgotPassword", validateForgotPasswordInput, forgotPassword);
-router.post("/forgotPassword/:id", resetPassword);
+router.post("/forgotPassword/:id", validateResetPasswordInput, resetPassword);
 
 export default router;

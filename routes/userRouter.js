@@ -8,12 +8,14 @@ import {
   removeFromHistory,
   saveVideo,
   unSaveVideo,
+  updatePassword,
   updateProfilePic,
   updateUserDetails,
 } from "../controllers/userController.js";
 import {
   validateSaveVideoInput,
   validateUpdateDetailsInput,
+  validateUpdatePasswordInput,
   validateUserDetailInput,
 } from "../middleware/validationMiddleware.js";
 import upload from "../middleware/multerMiddleware.js";
@@ -28,5 +30,6 @@ router.patch("/unSaveVideo", validateSaveVideoInput, unSaveVideo);
 router.patch("/addToHistory", validateSaveVideoInput, addToHistory);
 router.patch("/clearHistory", clearHistory);
 router.patch("/removeFromHistory", validateSaveVideoInput, removeFromHistory);
+router.patch("/updatePassword", validateUpdatePasswordInput, updatePassword);
 
 export default router;

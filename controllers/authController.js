@@ -9,6 +9,7 @@ import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { createJWT } from "../utils/jwtUtils.js";
 import { sendMail, transporter } from "../utils/nodemailer.js";
 import { compareFaces, loadModels } from "../utils/faceModel.js";
+import { body } from "express-validator";
 
 export const registerUser = async (req, res) => {
   const { email, password, phoneNumber } = req.body; //to access the items sent from front-end
@@ -148,5 +149,15 @@ export const forgotPassword = async (req, res) => {
 };
 
 export const resetPassword = async (req, res) => {
-  console.log(req.body);
+  const { password, confirmPassword } = req.body;
+  if (password === confirmPassword) {
+    const user = await User.findById(req.params.id);
+    if (!user) throw new NotFoundError("user not found");
+    const hashedPassword = await hashPassword(password);
+    user.password = hashedPassword;
+    await user.save();
+    res.status(200).send("<h1>Password has been Updated. </h1>");
+  } else {
+    res.status(400).send("<h1>Password does not match</h1>");
+  }
 };

@@ -141,7 +141,7 @@ export const forgotPassword = async (req, res) => {
     to: user.email, //sending email to newUser
     subject: "reset password",
     text: `You have requested a password reset for your Tron Academy account. You can reset your password in the following link.
-    http://localhost:3000/api/v1/auth/resetPassword/${user.id}`,
+     https://academyappbackend.onrender.com/api/v1/auth/resetPassword/${user.id}`,
   };
 
   await sendMail(transporter, mailOptions);

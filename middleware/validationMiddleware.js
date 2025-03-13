@@ -151,3 +151,17 @@ export const validateSaveVideoInput = withValidationErrors([
 export const validateForgotPasswordInput = withValidationErrors([
   body("email").notEmpty().withMessage("email is required"),
 ]);
+
+export const validateResetPasswordInput = withValidationErrors([
+  body("password").notEmpty().withMessage("password is required"),
+  body("confirmPassword")
+    .notEmpty()
+    .withMessage("confirm password is required"),
+]);
+
+export const validateUpdatePasswordInput = withValidationErrors([
+  body("currentPassword")
+    .notEmpty()
+    .withMessage("current password is required"),
+  body("newPassword").notEmpty().withMessage("new password is required"),
+]);

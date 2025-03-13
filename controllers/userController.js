@@ -2,6 +2,7 @@ import { BadRequestError, NotFoundError } from "../errors/customErrors.js";
 import { formatImage } from "../middleware/multerMiddleware.js";
 import User from "../models/UserModel.js";
 import { v2 as cloudinary } from "cloudinary";
+import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 
 export const addUserDetails = async (req, res) => {
   const { firstName, lastName, dateOfBirth, role, gender, address } = req.body;
@@ -123,4 +124,20 @@ export const removeFromHistory = async (req, res) => {
   user.history = newVideos;
   await user.save();
   res.status(200).json({ message: "deleted successfully" });
+};
+
+export const updatePassword = async (req, res) => {
+  const user = await User.findById(req.user.userId);
+  if (!user) throw new NotFoundError("user not found");
+  const { currentPassword, newPassword } = req.body;
+  const isMatch = await comparePassword(currentPassword, user.password);
+
+  if (isMatch) {
+    const newHashedPassword = await hashPassword(newPassword);
+    user.password = newHashedPassword;
+    await user.save();
+    res.status(200).json({ message: "password updated successfully" });
+  } else {
+    res.status(400).json({ message: "invalid current password" });
+  }
 };

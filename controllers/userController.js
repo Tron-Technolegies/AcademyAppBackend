@@ -20,7 +20,9 @@ export const addUserDetails = async (req, res) => {
 };
 
 export const getUserInfo = async (req, res) => {
-  const user = await User.findById(req.user.userId).select("-password");
+  const user = await User.findById(req.user.userId)
+    .populate(["saved", "history"])
+    .select("-password");
   if (!user) throw new NotFoundError("user not found");
   res.status(200).json({ user });
 };

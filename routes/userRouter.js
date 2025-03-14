@@ -4,6 +4,8 @@ import {
   addToHistory,
   addUserDetails,
   clearHistory,
+  getAllHistory,
+  getAllSavedVideo,
   getUserInfo,
   removeFromHistory,
   saveVideo,
@@ -31,5 +33,7 @@ router.patch("/addToHistory", validateSaveVideoInput, addToHistory);
 router.patch("/clearHistory", clearHistory);
 router.patch("/removeFromHistory", validateSaveVideoInput, removeFromHistory);
 router.patch("/updatePassword", validateUpdatePasswordInput, updatePassword);
+router.get("/getAllSavedVideo", getAllSavedVideo);
+router.get("/getAllHistory", getAllHistory);
 
 export default router;

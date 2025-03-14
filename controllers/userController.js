@@ -3,6 +3,7 @@ import { formatImage } from "../middleware/multerMiddleware.js";
 import User from "../models/UserModel.js";
 import { v2 as cloudinary } from "cloudinary";
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
+import { response } from "express";
 
 export const addUserDetails = async (req, res) => {
   const { firstName, lastName, dateOfBirth, role, gender, address } = req.body;
@@ -140,4 +141,16 @@ export const updatePassword = async (req, res) => {
   } else {
     res.status(400).json({ message: "invalid current password" });
   }
+};
+
+export const getAllSavedVideo = async (req, res) => {
+  const user = await User.findById(req.user.userId).populate("saved");
+  if (!user) throw new NotFoundError("user not found");
+  res.status(200).json(user.saved);
+};
+
+export const getAllHistory = async (req, res) => {
+  const user = await User.findById(req.user.userId).populate("history");
+  if (!user) throw new NotFoundError("user not found");
+  res.status(200).json(user.history);
 };

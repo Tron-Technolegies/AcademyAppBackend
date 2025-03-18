@@ -165,3 +165,12 @@ export const validateUpdatePasswordInput = withValidationErrors([
     .withMessage("current password is required"),
   body("newPassword").notEmpty().withMessage("new password is required"),
 ]);
+
+export const validateAddMessageInput = withValidationErrors([
+  body("message").notEmpty().withMessage("message is required"),
+  body("subCommunityId")
+    .notEmpty()
+    .withMessage("sub community id is required")
+    .isMongoId()
+    .withMessage("invalid id"),
+]);

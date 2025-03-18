@@ -9,14 +9,6 @@ const MessageSchema = new Schema(
       type: mongoose.Types.ObjectId,
       ref: "User",
     },
-    subCommunity: {
-      type: mongoose.Types.ObjectId,
-      ref: "SubCommunity",
-    },
-    community: {
-      type: mongoose.Types.ObjectId,
-      ref: "Community",
-    },
   },
   { timestamps: true }
 );

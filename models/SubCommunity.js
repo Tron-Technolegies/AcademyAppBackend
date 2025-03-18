@@ -9,6 +9,12 @@ const SubCommunitySchema = new Schema(
       type: mongoose.Types.ObjectId,
       ref: "Community",
     },
+    messages: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Message",
+      },
+    ],
     subCommunityMembers: [
       {
         type: mongoose.Types.ObjectId,

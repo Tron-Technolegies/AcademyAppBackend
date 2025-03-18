@@ -41,3 +41,12 @@ export const deleteSubCommunity = async (req, res) => {
   if (!subCommunity) throw new NotFoundError("no community found");
   res.status(200).json("deleted successfully");
 };
+
+export const getSubCommunityByCommunity = async (req, res) => {
+  const { id } = req.query;
+  const subCommunity = await SubCommunity.find({
+    relatedCommunity: id,
+  });
+  if (!subCommunity) throw new NotFoundError("community not found");
+  res.status(200).json(subCommunity);
+};

@@ -5,6 +5,7 @@ import {
   deleteSubCommunity,
   getAllSubCommunity,
   getSingleSubCommunity,
+  getSubCommunityByCommunity,
   updateSubCommunity,
 } from "../controllers/subCommunityController.js";
 import { isAdmin } from "../middleware/authenticationMiddleware.js";
@@ -25,4 +26,6 @@ router.patch(
 );
 router.get("/getSubCommunity/:id", getSingleSubCommunity);
 router.delete("/deleteSubCommunity/:id", isAdmin, deleteSubCommunity);
+router.get("/subCommunityByComm", getSubCommunityByCommunity);
+
 export default router;

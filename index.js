@@ -26,8 +26,7 @@ import messageRouter from "./routes/messageRouter.js";
 //custom middleware imports
 import errorHandlerMiddleware from "./middleware/errorHandlerMiddleware.js";
 import { authenticateUser } from "./middleware/authenticationMiddleware.js";
-
-const app = express();
+import { app, server } from "./socket/socket.js";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUDNAME,
@@ -87,7 +86,7 @@ const port = 3000 || process.env.port;
 try {
   await mongoose.connect(process.env.MONGODB_URI);
   console.log("database successfully connected");
-  app.listen(port, () => {
+  server.listen(port, () => {
     console.log(`server connected on ${port}`);
   });
 } catch (error) {

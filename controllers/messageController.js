@@ -1,6 +1,7 @@
 import { NotFoundError } from "../errors/customErrors.js";
 import Message from "../models/MessageModel.js";
 import SubCommunity from "../models/SubCommunity.js";
+import { getReceiverSocketId, io } from "../socket/socket.js";
 
 export const addMessage = async (req, res) => {
   const { message, subCommunityId } = req.body;
@@ -13,6 +14,10 @@ export const addMessage = async (req, res) => {
   const subCommunity = await SubCommunity.findById(subCommunityId);
   if (!subCommunity) throw new NotFoundError("sub community not found");
   subCommunity.messages.push(newMessage._id);
+  const receiverSocketId = getReceiverSocketId(req.user.userId);
+  if (receiverSocketId) {
+    io.to(receiverSocketId).emit("newMessage", newMessage);
+  }
 
   await subCommunity.save();
   res.status(200).json({ message: "successfully created" });

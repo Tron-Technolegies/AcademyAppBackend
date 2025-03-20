@@ -14,7 +14,7 @@ export const addMessage = async (req, res) => {
   const subCommunity = await SubCommunity.findById(subCommunityId);
   if (!subCommunity) throw new NotFoundError("sub community not found");
   subCommunity.messages.push(newMessage._id);
-  const receiverSocketId = getReceiverSocketId(req.user.userId);
+  const receiverSocketId = getReceiverSocketId(subCommunityId);
   if (receiverSocketId) {
     io.to(receiverSocketId).emit("newMessage", newMessage);
   }

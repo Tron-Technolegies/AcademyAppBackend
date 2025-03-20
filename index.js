@@ -35,8 +35,9 @@ cloudinary.config({
 });
 
 const _dirname = dirname(fileURLToPath(import.meta.url));
+app.use(bodyParser.json({ limit: "1mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.json());
+
 app.use(cookieParser());
 app.use(express.static(path.resolve(_dirname, "./public")));
 

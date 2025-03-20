@@ -180,7 +180,7 @@ export const registerFace = async (req, res) => {
   if (!user) throw new NotFoundError("user not found");
   user.faceEmbeddings = faceEmbeddings;
   user.faceVerificationHistory.push({
-    timestamp: new Data(),
+    timestamp: new Date(),
     success: true,
     ipAddress: req.ip || null,
     deviceInfo: req.headers["user-agent"] || null,
@@ -198,7 +198,7 @@ export const verifyFace = async (req, res) => {
     await faceCompare.compareEmbeddings(faceEmbeddings, user.faceEmbeddings);
 
   user.faceVerificationHistory.push({
-    timestamp: new Data(),
+    timestamp: new Date(),
     success: matched,
     ipAddress: req.ip || null,
     deviceInfo: req.headers["user-agent"] || null,

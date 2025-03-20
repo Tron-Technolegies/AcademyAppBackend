@@ -38,7 +38,7 @@ router.post("/logout", logout);
 router.get("/resetPassword/:id", sendResetPassword);
 router.post("/forgotPassword", validateForgotPasswordInput, forgotPassword);
 router.post("/forgotPassword/:id", validateResetPasswordInput, resetPassword);
-router.post("/registerFace", registerFace);
-router.post("/verifyFace", verifyFace);
+router.post("/registerFace", authenticateUser, registerFace);
+router.post("/verifyFace", authenticateUser, verifyFace);
 
 export default router;

@@ -48,8 +48,28 @@ const UserSchema = new Schema(
 
     faceEmbeddings: {
       type: String,
+      default: null,
     },
-
+    faceVerificationHistory: [
+      {
+        timestamp: {
+          type: Date,
+          default: Date.now,
+        },
+        success: {
+          type: Boolean,
+          required: true,
+        },
+        ipAddress: {
+          type: String,
+          default: null,
+        },
+        deviceInfo: {
+          type: String,
+          default: null,
+        },
+      },
+    ],
     firstName: String,
     lastName: String,
     dateOfBirth: Date,

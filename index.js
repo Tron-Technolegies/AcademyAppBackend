@@ -10,6 +10,7 @@ import { fileURLToPath } from "url";
 import { v2 as cloudinary } from "cloudinary";
 import faceapi from "face-api.js";
 import cors from "cors";
+import morgan from "morgan";
 
 //router imports
 import authRouter from "./routes/authRouter.js";
@@ -37,9 +38,10 @@ cloudinary.config({
 const _dirname = dirname(fileURLToPath(import.meta.url));
 app.use(bodyParser.json({ limit: "1mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.resolve(_dirname, "./public")));
+app.use(morgan("tiny"));
 
 const allowedOrigins = ["http://localhost:5173", "http://localhost:5174"];
 

@@ -35,4 +35,3 @@ async function compareFaces(image1Base64, image2Base64) {
   return distance < 0.4;
 }
 export { compareFaces, loadModels };
-//hello

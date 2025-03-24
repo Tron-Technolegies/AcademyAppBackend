@@ -20,13 +20,7 @@ io.on("connection", (socket) => {
     console.log(`User ${socket.id} joined sub community ${subCommunityId}`);
 
     const messages = await Message.find({ subCommunityId })
-      .populate({
-        path: "messages", // Populate the 'messages' array
-        populate: {
-          path: "user", // Populate the 'user' field inside each message
-          model: "User", // Specify that the 'user' field refers to the 'User' model
-        },
-      })
+      .populate("user")
       .sort({ timeStamp: 1 });
     socket.emit("previousMessages", messages);
   });

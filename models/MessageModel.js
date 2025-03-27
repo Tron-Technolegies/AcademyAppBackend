@@ -5,6 +5,15 @@ const MessageSchema = new Schema(
     message: {
       type: String,
     },
+    imageUrl: {
+      type: String,
+    },
+    audioUrl: {
+      type: String,
+    },
+    duration: {
+      type: String,
+    },
     user: {
       type: mongoose.Types.ObjectId,
       ref: "User",
@@ -12,6 +21,10 @@ const MessageSchema = new Schema(
     subCommunityId: {
       type: mongoose.Types.ObjectId,
       ref: "SubCommunity",
+    },
+    type: {
+      type: String,
+      enum: ["text", "image", "voice"],
     },
   },
   { timestamps: true }

@@ -39,4 +39,3 @@ io.on("connection", (socket) => {
   });
 });
 export { app, io, server };
-//plan name, price, features , subscibres array mongoose id ref users.

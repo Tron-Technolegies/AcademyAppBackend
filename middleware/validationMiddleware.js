@@ -174,3 +174,9 @@ export const validateAddMessageInput = withValidationErrors([
     .isMongoId()
     .withMessage("invalid id"),
 ]);
+
+export const validatePlanInput = withValidationErrors([
+  body("planName").notEmpty().withMessage("plan name is required"),
+  body("price").notEmpty().withMessage("price is not found"),
+  body("features").notEmpty().withMessage("features is required"),
+]);

@@ -1,0 +1,1 @@
+const SubscriptionPlanSchema = new Schema({});

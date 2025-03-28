@@ -5,6 +5,7 @@ import Message from "../models/MessageModel.js";
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import uploadToCloudinary from "../utils/cloudinaryUtils.js";
+import { formatImage } from "../middleware/multerMiddleware.js";
 
 const storage = multer.memoryStorage();
 const upload = multer({
@@ -76,7 +77,8 @@ io.on("connection", (socket) => {
       const { subCommunityId, user, imageBuffer } = data;
 
       // Upload image to Cloudinary
-      const result = await uploadToCloudinary(imageBuffer, "image");
+      const file = formatImage(imageBuffer);
+      const result = await cloudinary.uploader.upload(file);
 
       // Save message with image URL to database
       const newMessage = new Message({
@@ -106,7 +108,8 @@ io.on("connection", (socket) => {
       const { subCommunityId, user, audioBuffer, duration } = data;
 
       // Upload audio to Cloudinary (using 'video' type for audio)
-      const result = await uploadToCloudinary(audioBuffer, "video");
+      const file = formatImage(audioBuffer);
+      const result = await cloudinary.uploader.upload(file);
 
       // Save voice message with audio URL and duration
       const newMessage = new Message({
@@ -138,30 +141,30 @@ io.on("connection", (socket) => {
   });
 });
 
-app.post("/api/upload", upload.single("file"), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded" });
-    }
+// app.post("/api/upload", upload.single("file"), async (req, res) => {
+//   try {
+//     if (!req.file) {
+//       return res.status(400).json({ error: "No file uploaded" });
+//     }
 
-    const resourceType = req.file.mimetype.startsWith("image/")
-      ? "image"
-      : req.file.mimetype.startsWith("audio/")
-      ? "video"
-      : "auto";
+//     const resourceType = req.file.mimetype.startsWith("image/")
+//       ? "image"
+//       : req.file.mimetype.startsWith("audio/")
+//       ? "video"
+//       : "auto";
 
-    const result = await uploadToCloudinary(req.file.buffer, resourceType);
+//     const result = await uploadToCloudinary(req.file.buffer, resourceType);
 
-    res.json({
-      url: result.secure_url,
-      resourceType,
-      duration: req.body.duration, // For voice messages
-    });
-  } catch (error) {
-    console.error("Upload error:", error);
-    res.status(500).json({ error: "Failed to upload file" });
-  }
-});
+//     res.json({
+//       url: result.secure_url,
+//       resourceType,
+//       duration: req.body.duration, // For voice messages
+//     });
+//   } catch (error) {
+//     console.error("Upload error:", error);
+//     res.status(500).json({ error: "Failed to upload file" });
+//   }
+// });
 
 export { app, io, server };
 

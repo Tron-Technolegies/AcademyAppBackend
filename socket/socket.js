@@ -72,15 +72,55 @@ io.on("connection", (socket) => {
     }
   });
 
+  // socket.on("sendImage", async (data) => {
+  //   try {
+  //     const { subCommunityId, user, imageBuffer } = data;
+
+  //     // Upload image to Cloudinary
+  //     const file = formatImage(imageBuffer);
+  //     const result = await cloudinary.uploader.upload(file);
+
+  //     // Save message with image URL to database
+  //     const newMessage = new Message({
+  //       subCommunityId,
+  //       user,
+  //       imageUrl: result.secure_url,
+  //       type: "image",
+  //     });
+  //     await newMessage.save();
+
+  //     // Broadcast image message
+  //     io.to(subCommunityId).emit("receiveMessage", {
+  //       _id: newMessage._id,
+  //       user,
+  //       imageUrl: result.secure_url,
+  //       type: "image",
+  //       timestamp: newMessage.createdAt,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error sending image:", error);
+  //     socket.emit("error", "Failed to send image");
+  //   }
+  // });
+
   socket.on("sendImage", async (data) => {
     try {
-      const { subCommunityId, user, imageBuffer } = data;
+      const { subCommunityId, user, imageBase64 } = data;
+
+      // Convert base64 to buffer
+      const imageBuffer = Buffer.from(imageBase64, "base64");
+
+      // Create a temporary file-like object
+      const fileObject = {
+        buffer: imageBuffer,
+        originalname: `image_${Date.now()}.jpg`, // ✅ Fixed: Added backticks (`)
+      };
 
       // Upload image to Cloudinary
-      const file = formatImage(imageBuffer);
-      const result = await cloudinary.uploader.upload(file);
+      const formattedImage = formatImage(fileObject);
+      const result = await cloudinary.uploader.upload(formattedImage);
 
-      // Save message with image URL to database
+      // Save to database
       const newMessage = new Message({
         subCommunityId,
         user,
@@ -89,7 +129,7 @@ io.on("connection", (socket) => {
       });
       await newMessage.save();
 
-      // Broadcast image message
+      // Broadcast message
       io.to(subCommunityId).emit("receiveMessage", {
         _id: newMessage._id,
         user,
@@ -99,7 +139,7 @@ io.on("connection", (socket) => {
       });
     } catch (error) {
       console.error("Error sending image:", error);
-      socket.emit("error", "Failed to send image");
+      socket.emit("error", "Failed to send image: " + error.message);
     }
   });
 

@@ -10,8 +10,18 @@ const parser = new DataParser(); // creating an instance of parser because the f
 
 export const formatImage = (file) => {
   //function to retrive the file content from the buffer
+  console.log("file", file);
+
   const fileExtension = path.extname(file.originalname).toString();
   return parser.format(fileExtension, file.buffer).content;
+};
+
+export const formatChatImage = (buffer, originalname) => {
+  console.log("Received buffer:", buffer);
+  console.log("Original file name:", originalname);
+
+  const fileExtension = path.extname(originalname).toString();
+  return parser.format(fileExtension, buffer).content;
 };
 
 export default upload;

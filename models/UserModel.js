@@ -2,12 +2,11 @@ import mongoose, { model, Mongoose, Schema, Types } from "mongoose";
 
 const EnrolledCoursesSchema = new Schema({
   //this schema is used for the enrolled courses in user schema
-  courses: [
-    {
-      type: mongoose.Types.ObjectId,
-      ref: "Course",
-    },
-  ],
+  course: {
+    type: mongoose.Types.ObjectId,
+    ref: "Course",
+  },
+
   progress: {
     type: Number,
   },

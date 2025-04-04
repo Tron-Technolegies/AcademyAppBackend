@@ -93,7 +93,6 @@ try {
   console.log("database successfully connected");
   server.listen(port, () => {
     console.log(`server connected on ${port}`);
-    console.log(`WebSocket endpoint: ws://localhost:${port}/socket.io/`);
   });
 } catch (error) {
   console.log(error);

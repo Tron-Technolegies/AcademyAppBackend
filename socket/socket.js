@@ -114,19 +114,22 @@ io.on("connection", (socket) => {
 
   socket.on("sendVoice", async (data) => {
     try {
-      const { subCommunityId, user, audioBuffer, duration } = data;
-
+      const { subCommunityId, user, audioBuffer, audioName } = data;
+      const buffer = Buffer.from(audioBuffer);
       // Upload audio to Cloudinary (using 'video' type for audio)
-      const file = formatChatImage(audioBuffer);
-      const result = await cloudinary.uploader.upload(file);
+      // const file = formatChatImage(buffer, audioName);
+      const result = await cloudinary.uploader.upload(buffer, {
+        resource_type: "auto",
+        public_id: `voice_messages/${audioName}`,
+      });
 
       // Save voice message with audio URL and duration
       const newMessage = new Message({
         subCommunityId,
         user,
         audioUrl: result.secure_url,
-        duration,
         type: "voice",
+        audioName: audioName,
       });
       await newMessage.save();
 
@@ -135,8 +138,9 @@ io.on("connection", (socket) => {
         _id: newMessage._id,
         user,
         audioUrl: result.secure_url,
-        duration,
+
         type: "voice",
+        audioName: newMessage.audioName,
         timestamp: newMessage.createdAt,
       });
     } catch (error) {

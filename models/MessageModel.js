@@ -24,7 +24,7 @@ const MessageSchema = new Schema(
     },
     type: {
       type: String,
-      enum: ["text", "image", "voice"],
+      enum: ["text", "image", "voice", "audio"],
     },
   },
   { timestamps: true }

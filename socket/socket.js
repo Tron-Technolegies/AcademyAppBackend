@@ -5,10 +5,7 @@ import Message from "../models/MessageModel.js";
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import uploadToCloudinary from "../utils/cloudinaryUtils.js";
-import {
-  formatChatImage,
-  formatImage,
-} from "../middleware/multerMiddleware.js";
+import { formatChatImage } from "../middleware/multerMiddleware.js";
 import { Buffer } from "buffer";
 
 const storage = multer.memoryStorage();
@@ -118,39 +115,33 @@ io.on("connection", (socket) => {
 
     try {
       const { subCommunityId, user, audioBuffer, audioName } = data;
-      console.log("SubCommunity ID:", subCommunityId);
-      console.log("Audio Name:", audioName);
+      const buffer = new Buffer.from(audioBuffer);
+      const file = formatChatImage(buffer, audioName);
 
-      const buffer = Buffer.from(audioBuffer);
-      console.log("Converted to Buffer:", buffer);
-
-      const result = await cloudinary.uploader.upload(buffer, {
-        resource_type: "auto",
-        public_id: `voice_messages/${audioName}`,
+      const result = await cloudinary.uploader.upload(file, {
+        resource_type: "video", // Needed for audio files too
+        public_id: `${Date.now()}_${audioName}`,
       });
-
-      console.log("Uploaded to Cloudinary:", result);
 
       const newMessage = new Message({
         subCommunityId,
         user,
         audioUrl: result.secure_url,
-        type: "voice",
-        audioName: audioName,
+        type: "audio",
       });
+
       await newMessage.save();
 
       io.to(subCommunityId).emit("receiveMessage", {
         _id: newMessage._id,
         user,
         audioUrl: result.secure_url,
-        type: "voice",
-        audioName: newMessage.audioName,
+        type: "audio",
         timestamp: newMessage.createdAt,
       });
       console.log("Message broadcasted successfully.");
     } catch (error) {
-      console.error("Error sending voice message:", error);
+      console.error("Error sending voice:", error);
       socket.emit("error", "Failed to send voice message");
     }
   });
@@ -159,6 +150,8 @@ io.on("connection", (socket) => {
     console.log("user disconnected: ", socket.id);
   });
 });
+
+export { app, io, server };
 
 // app.post("/api/upload", upload.single("file"), async (req, res) => {
 //   try {
@@ -184,47 +177,3 @@ io.on("connection", (socket) => {
 //     res.status(500).json({ error: "Failed to upload file" });
 //   }
 // });
-
-export { app, io, server };
-
-// // import express from "express";
-// // import http from "http";
-// // import { Server } from "socket.io";
-// // import Message from "../models/MessageModel.js";
-// // import { timeStamp } from "console";
-
-// // const app = express();
-// // const server = http.createServer(app);
-// // const io = new Server(server, {
-// //   cors: {
-// //     origin: "*",
-// //     methods: ["GET", "PUT", "POST", "PATCH"],
-// //   },
-// // });
-
-// // io.on("connection", (socket) => {
-// //   console.log("a user connected: ", socket.id);
-// //   socket.on("joinCommunity", async (subCommunityId) => {
-// //     socket.join(subCommunityId);
-// //     console.log(`User ${socket.id} joined sub community ${subCommunityId}`);
-
-// //     const messages = await Message.find({ subCommunityId })
-// //       .populate("user")
-// //       .sort({ timeStamp: 1 });
-// //     socket.emit("previousMessages", messages);
-// //   });
-// //   socket.on("sendMessage", async (data) => {
-// //     const { subCommunityId, user, message } = data;
-// //     const newMessage = new Message({ subCommunityId, user, message });
-// //     await newMessage.save();
-// //     io.to(subCommunityId).emit("receiveMessage", {
-// //       user,
-// //       message,
-// //       timestamp: newMessage.createdAt,
-// //     });
-// //   });
-// //   socket.on("disconnect", () => {
-// //     console.log("user disconnected", socket.id);
-// //   });
-// // });
-// // export { app, io, server };

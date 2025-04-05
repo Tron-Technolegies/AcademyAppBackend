@@ -8,7 +8,6 @@ import cookieParser from "cookie-parser";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 import { v2 as cloudinary } from "cloudinary";
-import faceapi from "face-api.js";
 import cors from "cors";
 import morgan from "morgan";
 
@@ -98,3 +97,4 @@ try {
   console.log(error);
   process.exit(1);
 }
+///

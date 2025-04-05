@@ -8,8 +8,8 @@ import User from "../models/UserModel.js";
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { createJWT } from "../utils/jwtUtils.js";
 import { sendMail, transporter } from "../utils/nodemailer.js";
-import { compareFaces, loadModels } from "../utils/faceModel.js";
-import { body } from "express-validator";
+import FaceCompare from "../utils/faceCompare.js";
+// import { compareFaces, loadModels } from "../utils/faceModel.js";
 
 export const registerUser = async (req, res) => {
   const { email, password, phoneNumber } = req.body; //to access the items sent from front-end
@@ -97,33 +97,33 @@ export const logout = async (req, res) => {
   res.status(200).json({ message: "Logged out successfully ", token });
 };
 
-export const saveFace = async (req, res) => {
-  //code for face recognition to add face
-  const user = await User.findById(req.user.userId);
-  if (!user) throw new NotFoundError("user not found");
-  const imageBuffer = req.file.buffer; //we get id from the buffer file , it is in different format
-  const base64Image = imageBuffer.toString("base64"); //coverting to string
-  user.faceEmbeddings = base64Image; //store it in the faceembeddings.
-  await user.save();
-  res.status(200).json({ message: "face saved successfully" });
-};
+// export const saveFace = async (req, res) => {
+//   //code for face recognition to add face
+//   const user = await User.findById(req.user.userId);
+//   if (!user) throw new NotFoundError("user not found");
+//   const imageBuffer = req.file.buffer; //we get id from the buffer file , it is in different format
+//   const base64Image = imageBuffer.toString("base64"); //coverting to string
+//   user.faceEmbeddings = base64Image; //store it in the faceembeddings.
+//   await user.save();
+//   res.status(200).json({ message: "face saved successfully" });
+// };
 
-export const compareFace = async (req, res) => {
-  //code to compare face.
-  const user = await User.findById(req.user.userId);
-  if (!user) throw new NotFoundError("user not found");
-  await loadModels();
-  const imageBuffer = req.file.buffer;
-  const newImageBase64 = imageBuffer.toString("base64");
+// export const compareFace = async (req, res) => {
+//   //code to compare face.
+//   const user = await User.findById(req.user.userId);
+//   if (!user) throw new NotFoundError("user not found");
+//   await loadModels();
+//   const imageBuffer = req.file.buffer;
+//   const newImageBase64 = imageBuffer.toString("base64");
 
-  const isMatch = await compareFaces(user.faceEmbeddings, newImageBase64);
+//   const isMatch = await compareFaces(user.faceEmbeddings, newImageBase64);
 
-  if (isMatch) {
-    res.status(200).json({ message: "face verification successful" });
-  } else {
-    res.status(401).json({ message: "verification failed" });
-  }
-};
+//   if (isMatch) {
+//     res.status(200).json({ message: "face verification successful" });
+//   } else {
+//     res.status(401).json({ message: "verification failed" });
+//   }
+// };
 
 export const sendResetPassword = async (req, res) => {
   const { id } = req.params;
@@ -160,4 +160,53 @@ export const resetPassword = async (req, res) => {
   } else {
     res.status(400).send("<h1>Password does not match</h1>");
   }
+};
+
+export const registerFace = async (req, res) => {
+  const { faceEmbeddings } = req.body;
+  const faceData = JSON.parse(faceEmbeddings);
+  if (!faceData.landmarks || Object.keys(faceData.landmarks).length < 3)
+    throw new BadRequestError(
+      "invalid face data : insufficient facial land marks"
+    );
+  const requiredLandmarks = ["leftEye", "rightEye", "noseBase"];
+  const missingLandmarks = requiredLandmarks.filter(
+    (landmark) => !faceData.landmarks[landmark]
+  );
+
+  if (missingLandmarks.length > 0)
+    throw new BadRequestError("invalid face data missing required land marks");
+  const user = await User.findById(req.user.userId);
+  if (!user) throw new NotFoundError("user not found");
+  user.faceEmbeddings = faceEmbeddings;
+  user.faceVerificationHistory.push({
+    timestamp: new Date(),
+    success: true,
+    ipAddress: req.ip || null,
+    deviceInfo: req.headers["user-agent"] || null,
+  });
+  await user.save();
+  res.status(200).json({ message: "created successfully" });
+};
+
+export const verifyFace = async (req, res) => {
+  const { faceEmbeddings } = req.body;
+  const user = await User.findById(req.user.userId);
+  if (!user) throw new NotFoundError("user not found");
+  const faceCompare = new FaceCompare();
+  const { matched, similarity, threshold } =
+    await faceCompare.compareEmbeddings(faceEmbeddings, user.faceEmbeddings);
+
+  user.faceVerificationHistory.push({
+    timestamp: new Date(),
+    success: matched,
+    ipAddress: req.ip || null,
+    deviceInfo: req.headers["user-agent"] || null,
+  });
+  res.status(200).json({
+    success: true,
+    matched,
+    similarity: similarity.toFixed(4),
+    threshold,
+  });
 };

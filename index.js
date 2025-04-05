@@ -9,6 +9,7 @@ import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 import { v2 as cloudinary } from "cloudinary";
 import cors from "cors";
+import morgan from "morgan";
 
 //router imports
 import authRouter from "./routes/authRouter.js";
@@ -22,6 +23,7 @@ import videoRouter from "./routes/videoRouter.js";
 import subCommunityRouter from "./routes/subCommunityRouter.js";
 import classRouter from "./routes/classRouter.js";
 import messageRouter from "./routes/messageRouter.js";
+import planRouter from "./routes/planRouter.js";
 //custom middleware imports
 import errorHandlerMiddleware from "./middleware/errorHandlerMiddleware.js";
 import { authenticateUser } from "./middleware/authenticationMiddleware.js";
@@ -34,10 +36,12 @@ cloudinary.config({
 });
 
 const _dirname = dirname(fileURLToPath(import.meta.url));
+app.use(bodyParser.json({ limit: "1mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.resolve(_dirname, "./public")));
+app.use(morgan("tiny"));
 
 const allowedOrigins = ["http://localhost:5173", "http://localhost:5174"];
 
@@ -74,6 +78,7 @@ app.use("/api/v1/video", authenticateUser, videoRouter);
 app.use("/api/v1/subCommunity", authenticateUser, subCommunityRouter);
 app.use("/api/v1/class", authenticateUser, classRouter);
 app.use("/api/v1/messages", authenticateUser, messageRouter);
+app.use("/api/v1/plan", authenticateUser, planRouter);
 
 app.use("*", (req, res) => {
   res.status(404).json({ message: "not found" }); //this error will trigger when the request route do not match any of the above routes

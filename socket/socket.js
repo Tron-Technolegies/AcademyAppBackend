@@ -70,6 +70,7 @@ io.on("connection", (socket) => {
         message,
         type: "text",
         timestamp: newMessage.createdAt,
+        zz,
       });
     } catch (error) {
       console.error("Error sending message:", error);
@@ -113,17 +114,23 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendVoice", async (data) => {
+    console.log("Received voice data:", data); // Check data received
+
     try {
       const { subCommunityId, user, audioBuffer, audioName } = data;
+      console.log("SubCommunity ID:", subCommunityId);
+      console.log("Audio Name:", audioName);
+
       const buffer = Buffer.from(audioBuffer);
-      // Upload audio to Cloudinary (using 'video' type for audio)
-      // const file = formatChatImage(buffer, audioName);
+      console.log("Converted to Buffer:", buffer);
+
       const result = await cloudinary.uploader.upload(buffer, {
         resource_type: "auto",
         public_id: `voice_messages/${audioName}`,
       });
 
-      // Save voice message with audio URL and duration
+      console.log("Uploaded to Cloudinary:", result);
+
       const newMessage = new Message({
         subCommunityId,
         user,
@@ -133,16 +140,15 @@ io.on("connection", (socket) => {
       });
       await newMessage.save();
 
-      // Broadcast voice message
       io.to(subCommunityId).emit("receiveMessage", {
         _id: newMessage._id,
         user,
         audioUrl: result.secure_url,
-
         type: "voice",
         audioName: newMessage.audioName,
         timestamp: newMessage.createdAt,
       });
+      console.log("Message broadcasted successfully.");
     } catch (error) {
       console.error("Error sending voice message:", error);
       socket.emit("error", "Failed to send voice message");

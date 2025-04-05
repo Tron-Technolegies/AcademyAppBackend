@@ -101,6 +101,9 @@ const UserSchema = new Schema(
         ref: "Community", //naming should be capital
       },
     ],
+    subscriptionType: {
+      type: String,
+    },
   },
   {
     timestamps: true,

@@ -15,6 +15,9 @@ const MessageSchema = new Schema(
     fileUrl: {
       type: String,
     },
+    fileName: {
+      type: String,
+    },
     duration: {
       type: String,
     },

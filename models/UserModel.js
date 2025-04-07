@@ -1,5 +1,17 @@
 import mongoose, { model, Mongoose, Schema, Types } from "mongoose";
 
+const SubscriptionSchema = new Schema({
+  subscriptionName: {
+    type: String,
+  },
+  startDate: {
+    type: Date,
+  },
+  endDate: {
+    type: Date,
+  },
+});
+
 const EnrolledCoursesSchema = new Schema({
   //this schema is used for the enrolled courses in user schema
   course: {
@@ -103,6 +115,9 @@ const UserSchema = new Schema(
     ],
     subscriptionType: {
       type: String,
+    },
+    subscriptionHistory: {
+      type: [SubscriptionSchema],
     },
   },
   {

@@ -35,3 +35,11 @@ export const isAdmin = async (req, res, next) => {
     throw new UnauthorizedError("Access Denied");
   }
 };
+
+export const isPaidSubscriber = async (req, res, next) => {
+  if (req.user.subscriptionType === "subscriber") {
+    next();
+  } else {
+    throw new UnauthorizedError("Access Denied");
+  }
+};

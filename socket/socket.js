@@ -152,6 +152,7 @@ io.on("connection", (socket) => {
       const result = await cloudinary.uploader.upload(file, {
         resource_type: "raw", // very important for files!
         public_id: `${Date.now()}_${fileName}`,
+        access_mode: "public",
       });
 
       const newMessage = new Message({

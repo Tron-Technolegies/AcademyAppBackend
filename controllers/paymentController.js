@@ -33,8 +33,8 @@ export const createPaymentIntent = async (req, res) => {
   });
   await payment.save();
   res.status(200).json({
-    clientSecret: paymentIntent.client_secret,
-    paymentId: payment._id,
+    client_secret: paymentIntent.client_secret,
+    payment_id: payment._id,
   });
 };
 
@@ -47,7 +47,6 @@ export const handlePaymentSuccess = async (req, res) => {
   payment.stripeChargeId = paymentIntent.charges.data[0]?.id;
   payment.paymentGatewayResponse = paymentIntent;
   await payment.save();
-
   if (payment.status === "success") {
     const user = await User.findById(req.user.userId);
     user.transactions.push(payment._id);

@@ -119,6 +119,22 @@ const UserSchema = new Schema(
     subscriptionHistory: {
       type: [SubscriptionSchema],
     },
+    stripeCustomerId: String,
+    paymentMethods: [
+      {
+        paymentMethodId: String,
+        cardBrand: String,
+        cardLast4: String,
+        isDefault: Boolean,
+        addedAt: { type: Date, default: Date.now },
+      },
+    ],
+    transactions: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Payment",
+      },
+    ],
   },
   {
     timestamps: true,

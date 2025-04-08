@@ -20,7 +20,7 @@ export const createPaymentIntent = async (req, res) => {
     amount: Math.round(amount * 100),
     currency: currency || "inr",
     customer: user.stripeCustomerId,
-    payment_method_types: ["card", "upi"],
+    // payment_method_types: ["card", "upi"],
     metadata: { userId: user._id.toString() },
   });
   const payment = new Payment({
@@ -60,6 +60,13 @@ export const handlePaymentSuccess = async (req, res) => {
         cardBrand: paymentMethod.card?.brand,
         cardLast4: paymentMethod.card?.last4,
         isDefault: user.paymentMethods.length === 0,
+      });
+      user.subscriptionType = "subscriber";
+      const startDate = new Date();
+      user.subscriptionHistory.push({
+        subscriptionName: "Individual",
+        startDate: startDate,
+        endDate: new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000),
       });
       await user.save();
     }

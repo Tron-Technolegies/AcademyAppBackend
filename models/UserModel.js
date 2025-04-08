@@ -18,7 +18,6 @@ const EnrolledCoursesSchema = new Schema({
     type: mongoose.Types.ObjectId,
     ref: "Course",
   },
-
   progress: {
     type: Number,
   },

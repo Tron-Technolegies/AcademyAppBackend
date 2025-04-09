@@ -4,6 +4,7 @@ import {
   UnauthorizedError,
 } from "../errors/customErrors.js";
 import { verifyJWT } from "../utils/jwtUtils.js";
+import User from "../models/UserModel.js";
 
 export const redisClient = createClient();
 
@@ -19,7 +20,14 @@ export const authenticateUser = async (req, res, next) => {
     const decoded = verifyJWT(token);
 
     const { userId, role } = decoded;
-
+    const user = await User.findById(userId);
+    if (user.subscriptionType === "subscriber") {
+      const today = new Date();
+      if (user.subscriptionEndDate < today) {
+        user.subscriptionType === "free-user";
+        await user.save();
+      }
+    }
     req.user = { userId: userId, role: role };
     next();
   } catch (error) {

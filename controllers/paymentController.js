@@ -32,6 +32,8 @@ export const createPaymentIntent = async (req, res) => {
     paymentMethod,
   });
   await payment.save();
+  console.log("payment secret: ", paymentIntent.client_secret);
+
   res.status(200).json({
     client_secret: paymentIntent.client_secret,
     payment_id: payment._id,
@@ -67,6 +69,10 @@ export const handlePaymentSuccess = async (req, res) => {
         startDate: startDate,
         endDate: new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000),
       });
+      user.subscriptionStartDate = startDate;
+      user.subscriptionEndDate = new Date(
+        startDate.getTime() + 30 * 24 * 60 * 60 * 1000
+      );
       await user.save();
     }
   }

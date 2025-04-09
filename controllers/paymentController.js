@@ -42,11 +42,11 @@ export const createPaymentIntent = async (req, res) => {
 
 export const handlePaymentSuccess = async (req, res) => {
   const { paymentId, paymentIntentId } = req.body;
-  console.log("paymentID:", paymentId);
-  console.log("paymentIntentID:", paymentIntentId);
+  // console.log("paymentID:", paymentId);
+  // console.log("paymentIntentID:", paymentIntentId);
 
   const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-  console.log("paymentIntent:", paymentIntent);
+  // console.log("paymentIntent:", paymentIntent);
 
   const payment = await Payment.findById(paymentId).populate("user");
   if (!payment) throw new NotFoundError("No Payment data found");
@@ -79,7 +79,7 @@ export const handlePaymentSuccess = async (req, res) => {
     user.subscriptionEndDate = new Date(
       startDate.getTime() + 30 * 24 * 60 * 60 * 1000
     );
-    user.transactions.push(paymentId);
+
     await user.save();
   }
   res.status(200).json({ success: true, payment });

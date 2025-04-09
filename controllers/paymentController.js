@@ -85,29 +85,31 @@ export const handlePaymentSuccess = async (req, res) => {
 };
 
 export const stripeWebHook = async (req, res) => {
-  const sig = req.headers["stripe-signature"];
   let event;
   try {
+    console.log("Webhook received - raw body length:", req.body?.length);
+    const sig = req.headers["stripe-signature"];
+    const rawBody = req.body; // Already raw due to middleware
     event = stripe.webhooks.constructEvent(
-      req.rawBody,
+      rawBody,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
+    switch (event.type) {
+      case "payment_intent.succeeded":
+        await handleSuccessfulPayment(event.data.object);
+        break;
+      case "payment_intent.payment_failed":
+        await handleFailedPayment(event.data.object);
+        break;
+      default:
+        console.log(`Unhandled event type ${event.type}`);
+    }
+    res.json({ received: true });
   } catch (err) {
     console.error("Webhook signature verification failed:", err);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
-  switch (event.type) {
-    case "payment_intent.succeeded":
-      await handleSuccessfulPayment(event.data.object);
-      break;
-    case "payment_intent.payment_failed":
-      await handleFailedPayment(event.data.object);
-      break;
-    default:
-      console.log(`Unhandled event type ${event.type}`);
-  }
-  res.json({ received: true });
 };
 
 async function handleSuccessfulPayment(paymentIntent) {

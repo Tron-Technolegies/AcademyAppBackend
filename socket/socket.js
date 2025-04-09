@@ -146,6 +146,43 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("sendFile", async (data) => {
+    try {
+      const { subCommunityId, user, fileBuffer, fileName, mimeType } = data;
+
+      const buffer = Buffer.from(fileBuffer);
+      const file = formatChatImage(buffer, fileName); // reuse your helper or rename if needed
+
+      const result = await cloudinary.uploader.upload(file, {
+        resource_type: "raw", // very important for files!
+        public_id: `${Date.now()}_${fileName}`,
+        access_mode: "public",
+      });
+
+      const newMessage = new Message({
+        subCommunityId,
+        user,
+        fileUrl: result.secure_url,
+        fileName,
+        type: "file",
+      });
+
+      await newMessage.save();
+
+      io.to(subCommunityId).emit("receiveMessage", {
+        _id: newMessage._id,
+        user,
+        fileUrl: result.secure_url,
+        fileName,
+        type: "file",
+        timestamp: newMessage.createdAt,
+      });
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      socket.emit("error", "Failed to upload file");
+    }
+  });
+
   socket.on("disconnect", () => {
     console.log("user disconnected: ", socket.id);
   });

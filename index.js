@@ -24,10 +24,12 @@ import subCommunityRouter from "./routes/subCommunityRouter.js";
 import classRouter from "./routes/classRouter.js";
 import messageRouter from "./routes/messageRouter.js";
 import planRouter from "./routes/planRouter.js";
+import paymentRouter from "./routes/paymentRouter.js";
 //custom middleware imports
 import errorHandlerMiddleware from "./middleware/errorHandlerMiddleware.js";
 import { authenticateUser } from "./middleware/authenticationMiddleware.js";
 import { app, server } from "./socket/socket.js";
+import { stripeWebHook } from "./controllers/paymentController.js";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUDNAME,
@@ -36,12 +38,6 @@ cloudinary.config({
 });
 
 const _dirname = dirname(fileURLToPath(import.meta.url));
-app.use(bodyParser.json({ limit: "1mb" }));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(cookieParser());
-app.use(express.static(path.resolve(_dirname, "./public")));
-app.use(morgan("tiny"));
 
 const allowedOrigins = ["http://localhost:5173", "http://localhost:5174"];
 
@@ -60,6 +56,17 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
+app.post(
+  "/api/v1/payments/webhook",
+  express.raw({ type: "application/json" }),
+  stripeWebHook
+);
+app.use(bodyParser.json({ limit: "1mb" }));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cookieParser());
+app.use(express.static(path.resolve(_dirname, "./public")));
+app.use(morgan("tiny"));
 
 app.options("*", cors());
 app.get("/", (req, res) => {
@@ -79,6 +86,7 @@ app.use("/api/v1/subCommunity", authenticateUser, subCommunityRouter);
 app.use("/api/v1/class", authenticateUser, classRouter);
 app.use("/api/v1/messages", authenticateUser, messageRouter);
 app.use("/api/v1/plan", authenticateUser, planRouter);
+app.use("/api/v1/payments", paymentRouter);
 
 app.use("*", (req, res) => {
   res.status(404).json({ message: "not found" }); //this error will trigger when the request route do not match any of the above routes

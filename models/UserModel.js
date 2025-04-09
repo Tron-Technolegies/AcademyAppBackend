@@ -1,12 +1,23 @@
 import mongoose, { model, Mongoose, Schema, Types } from "mongoose";
 
+const SubscriptionSchema = new Schema({
+  subscriptionName: {
+    type: String,
+  },
+  startDate: {
+    type: Date,
+  },
+  endDate: {
+    type: Date,
+  },
+});
+
 const EnrolledCoursesSchema = new Schema({
   //this schema is used for the enrolled courses in user schema
   course: {
     type: mongoose.Types.ObjectId,
     ref: "Course",
   },
-
   progress: {
     type: Number,
   },
@@ -99,6 +110,34 @@ const UserSchema = new Schema(
       {
         type: mongoose.Types.ObjectId,
         ref: "Community", //naming should be capital
+      },
+    ],
+    subscriptionType: {
+      type: String,
+    },
+    subscriptionHistory: {
+      type: [SubscriptionSchema],
+    },
+    subscriptionStartDate: {
+      type: Date,
+    },
+    subscriptionEndDate: {
+      type: Date,
+    },
+    stripeCustomerId: String,
+    paymentMethods: [
+      {
+        paymentMethodId: String,
+        cardBrand: String,
+        cardLast4: String,
+        isDefault: Boolean,
+        addedAt: { type: Date, default: Date.now },
+      },
+    ],
+    transactions: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Payment",
       },
     ],
   },

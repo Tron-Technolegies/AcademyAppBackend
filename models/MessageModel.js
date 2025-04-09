@@ -1,4 +1,5 @@
 import mongoose, { model, Schema } from "mongoose";
+import { type } from "os";
 
 const MessageSchema = new Schema(
   {
@@ -9,6 +10,12 @@ const MessageSchema = new Schema(
       type: String,
     },
     audioUrl: {
+      type: String,
+    },
+    fileUrl: {
+      type: String,
+    },
+    fileName: {
       type: String,
     },
     duration: {
@@ -24,7 +31,7 @@ const MessageSchema = new Schema(
     },
     type: {
       type: String,
-      enum: ["text", "image", "voice", "audio"],
+      enum: ["text", "image", "voice", "audio", "file"],
     },
   },
   { timestamps: true }

@@ -154,3 +154,12 @@ export const getAllHistory = async (req, res) => {
   if (!user) throw new NotFoundError("user not found");
   res.status(200).json(user.history);
 };
+
+export const managePlan = async (req, res) => {
+  const { planType } = req.body;
+  const user = await User.findById(req.user.userId);
+  if (!user) throw new NotFoundError("No user found");
+  user.subscriptionType = planType;
+  await user.save();
+  res.status(200).json({ msg: "success" });
+};

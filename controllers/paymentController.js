@@ -51,7 +51,7 @@ export const handlePaymentSuccess = async (req, res) => {
   const payment = await Payment.findById(paymentId).populate("user");
   if (!payment) throw new NotFoundError("No Payment data found");
   payment.status = paymentIntent.status === "succeeded" ? "success" : "failed";
-  payment.stripeChargeId = paymentIntent.charges.data[0]?.id;
+  payment.stripeChargeId = paymentIntent.latest_charge || null;
   payment.paymentGatewayResponse = paymentIntent;
   await payment.save();
   if (payment.status === "success") {
@@ -119,7 +119,7 @@ async function handleSuccessfulPayment(paymentIntent) {
 
   if (payment) {
     payment.status = "success";
-    payment.stripeChargeId = paymentIntent.charges.data[0]?.id;
+    payment.stripeChargeId = paymentIntent.latest_charge || null;
     payment.paymentGatewayResponse = paymentIntent;
     await payment.save();
   }

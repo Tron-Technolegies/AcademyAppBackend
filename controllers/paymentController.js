@@ -67,19 +67,20 @@ export const handlePaymentSuccess = async (req, res) => {
         cardLast4: paymentMethod.card?.last4,
         isDefault: user.paymentMethods.length === 0,
       });
-      user.subscriptionType = "subscriber";
-      const startDate = new Date();
-      user.subscriptionHistory.push({
-        subscriptionName: "Individual",
-        startDate: startDate,
-        endDate: new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000),
-      });
-      user.subscriptionStartDate = startDate;
-      user.subscriptionEndDate = new Date(
-        startDate.getTime() + 30 * 24 * 60 * 60 * 1000
-      );
-      await user.save();
     }
+    user.subscriptionType = "subscriber";
+    const startDate = new Date();
+    user.subscriptionHistory.push({
+      subscriptionName: "Individual",
+      startDate: startDate,
+      endDate: new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000),
+    });
+    user.subscriptionStartDate = startDate;
+    user.subscriptionEndDate = new Date(
+      startDate.getTime() + 30 * 24 * 60 * 60 * 1000
+    );
+    user.transactions.push(paymentId);
+    await user.save();
   }
   res.status(200).json({ success: true, payment });
 };

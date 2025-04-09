@@ -80,7 +80,7 @@ app.use("/api/v1/subCommunity", authenticateUser, subCommunityRouter);
 app.use("/api/v1/class", authenticateUser, classRouter);
 app.use("/api/v1/messages", authenticateUser, messageRouter);
 app.use("/api/v1/plan", authenticateUser, planRouter);
-app.use("/api/v1/payments", authenticateUser, paymentRouter);
+app.use("/api/v1/payments", paymentRouter);
 
 app.use("*", (req, res) => {
   res.status(404).json({ message: "not found" }); //this error will trigger when the request route do not match any of the above routes

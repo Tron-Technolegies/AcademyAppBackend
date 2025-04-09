@@ -42,7 +42,12 @@ export const createPaymentIntent = async (req, res) => {
 
 export const handlePaymentSuccess = async (req, res) => {
   const { paymentId, paymentIntentId } = req.body;
+  console.log("paymentID:", paymentId);
+  console.log("paymentIntentID:", paymentIntentId);
+
   const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+  console.log("paymentIntent:", paymentIntent);
+
   const payment = await Payment.findById(paymentId).populate("user");
   if (!payment) throw new NotFoundError("No Payment data found");
   payment.status = paymentIntent.status === "succeeded" ? "success" : "failed";

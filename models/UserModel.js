@@ -118,6 +118,12 @@ const UserSchema = new Schema(
     subscriptionHistory: {
       type: [SubscriptionSchema],
     },
+    subscriptionStartDate: {
+      type: Date,
+    },
+    subscriptionEndDate: {
+      type: Date,
+    },
     stripeCustomerId: String,
     paymentMethods: [
       {

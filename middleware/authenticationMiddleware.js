@@ -28,6 +28,13 @@ export const authenticateUser = async (req, res, next) => {
         await user.save();
       }
     }
+    if (user.subscriptionType === "free-trial") {
+      const today = new Date();
+      if (user.freeTrialEnd < today) {
+        user.subscriptionType === "free-user";
+        await user.save();
+      }
+    }
     req.user = { userId: userId, role: role };
     next();
   } catch (error) {

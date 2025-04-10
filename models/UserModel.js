@@ -115,6 +115,12 @@ const UserSchema = new Schema(
     subscriptionType: {
       type: String,
     },
+    freeTrialStart: {
+      type: Date,
+    },
+    freeTrialEnd: {
+      type: Date,
+    },
     subscriptionHistory: {
       type: [SubscriptionSchema],
     },

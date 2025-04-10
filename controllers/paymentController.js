@@ -20,7 +20,7 @@ export const createPaymentIntent = async (req, res) => {
     amount: Math.round(amount * 100),
     currency: currency || "inr",
     customer: user.stripeCustomerId,
-    // payment_method_types: ["card", "upi"],
+    payment_method_types: ["card", "upi"],
     metadata: { userId: user._id.toString() },
   });
   const payment = new Payment({

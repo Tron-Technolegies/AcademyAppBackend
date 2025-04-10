@@ -6,6 +6,7 @@ import {
   getCourseByCategory,
   getEnrolledCourse,
   getSingleCourse,
+  makeCourseProgress,
   updateCourse,
   updateEnrollCourse,
 } from "../controllers/courseController.js";
@@ -21,4 +22,5 @@ router.delete("/deleteCourse/:id", isAdmin, deleteCourse);
 router.get("/getCourseByCategory", getCourseByCategory);
 router.patch("/updateEnrollCourse", updateEnrollCourse);
 router.get("/getEnrolledCourse", getEnrolledCourse);
+router.post("/course-progress", makeCourseProgress);
 export default router;

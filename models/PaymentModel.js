@@ -26,6 +26,7 @@ const paymentSchema = new Schema(
     paymentGatewayResponse: Object,
     description: String,
     metadata: Object,
+    paypalDetails: Object,
   },
   { timestamps: true }
 );

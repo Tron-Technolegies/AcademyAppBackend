@@ -16,12 +16,23 @@ export const createPaymentIntent = async (req, res) => {
     user.stripeCustomerId = customer.id;
     await user.save();
   }
+  const paymentMethods = ["card"];
+  if (process.env.STRIPE_PAYPAL_ENABLED === true) {
+    paymentMethods.push("paypal");
+  }
+
   const paymentIntent = await stripe.paymentIntents.create({
     amount: Math.round(amount * 100),
     currency: currency || "inr",
     customer: user.stripeCustomerId,
-    // payment_method_types: ["card", "upi"],
+    payment_method_types: paymentMethods,
     metadata: { userId: user._id.toString() },
+    payment_method_options: {
+      paypal: {
+        currency: currency || "inr",
+        capture_method: "manual", // or 'automatic' based on your needs
+      },
+    },
   });
   const payment = new Payment({
     user: user._id,
@@ -119,9 +130,19 @@ async function handleSuccessfulPayment(paymentIntent) {
   });
 
   if (payment) {
+    const paymentMethod = await stripe.paymentMethods.retrieve(
+      paymentIntent.payment_method
+    );
     payment.status = "success";
     payment.stripeChargeId = paymentIntent.latest_charge || null;
     payment.paymentGatewayResponse = paymentIntent;
+    if (paymentMethod === "paypal") {
+      payment.paypalDetails = {
+        email: paymentMethod.paypal?.payer_email,
+        payerId: paymentMethod.paypal?.payer_id,
+        transactionId: paymentIntent.charges?.data[0]?.id, // Charge ID
+      };
+    }
     await payment.save();
   }
 }

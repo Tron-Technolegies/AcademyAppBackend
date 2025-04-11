@@ -1,6 +1,7 @@
 import Course from "../models/CourseModel.js";
-import { NotFoundError } from "../errors/customErrors.js";
+import { BadRequestError, NotFoundError } from "../errors/customErrors.js";
 import User from "../models/UserModel.js";
+import Video from "../models/VideoModel.js";
 
 export const addCourse = async (req, res) => {
   const { courseName, courseCategory, instructor, courseOverView } = req.body;
@@ -72,4 +73,30 @@ export const getEnrolledCourse = async (req, res) => {
   }).populate("enrolledCourses.course");
   if (!user) throw new NotFoundError("user not found");
   res.status(200).json(user);
+};
+
+export const makeCourseProgress = async (req, res) => {
+  const user = await User.findById(req.user.userId);
+  if (!user) throw new NotFoundError("No user found");
+  const video = await Video.findById(req.body.videoId);
+  if (!video) throw new NotFoundError("No video found");
+  const enrolled = user.enrolledCourses.find(
+    (item) => item.course.toString() === video.relatedCourse.toString()
+  );
+  if (!enrolled) throw new BadRequestError("user not enrolled in this course");
+  const alreadyWatched = enrolled.watchedVideos.some(
+    (item) => item.toString() === req.body.videoId
+  );
+  if (!alreadyWatched) {
+    enrolled.watchedVideos.push(req.body.videoId);
+    const totalVideos = await Video.countDocuments({
+      relatedCourse: video.relatedCourse.toString(),
+    });
+    const watchedCount = enrolled.watchedVideos.length;
+    enrolled.progress = Math.round((watchedCount / totalVideos) * 100);
+  }
+  await user.save();
+  res
+    .status(200)
+    .json({ msg: "Progress updated", progress: enrolled.progress });
 };

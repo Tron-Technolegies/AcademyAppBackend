@@ -160,6 +160,11 @@ export const managePlan = async (req, res) => {
   const user = await User.findById(req.user.userId);
   if (!user) throw new NotFoundError("No user found");
   user.subscriptionType = planType;
+  if (planType === "free-trial") {
+    const startDate = new Date();
+    user.freeTrialStart = startDate;
+    user.freeTrialEnd = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+  }
   await user.save();
   res.status(200).json({ msg: "success" });
 };

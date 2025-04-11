@@ -18,6 +18,12 @@ const EnrolledCoursesSchema = new Schema({
     type: mongoose.Types.ObjectId,
     ref: "Course",
   },
+  watchedVideos: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "Video",
+    },
+  ],
   progress: {
     type: Number,
   },
@@ -106,6 +112,7 @@ const UserSchema = new Schema(
         ref: "Video",
       },
     ],
+
     community: [
       {
         type: mongoose.Types.ObjectId,
@@ -114,6 +121,12 @@ const UserSchema = new Schema(
     ],
     subscriptionType: {
       type: String,
+    },
+    freeTrialStart: {
+      type: Date,
+    },
+    freeTrialEnd: {
+      type: Date,
     },
     subscriptionHistory: {
       type: [SubscriptionSchema],

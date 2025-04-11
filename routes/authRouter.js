@@ -7,6 +7,7 @@ import {
   logout,
   registerFace,
   registerUser,
+  resendOtp,
   resetPassword,
   // saveFace,
   sendResetPassword,
@@ -18,6 +19,7 @@ import {
   validateLoginInput,
   validateOtpInput,
   validateRegisterInput,
+  validateResendOtpInput,
   validateResetPasswordInput,
 } from "../middleware/validationMiddleware.js";
 import { authenticateUser } from "../middleware/authenticationMiddleware.js";
@@ -34,5 +36,6 @@ router.post("/forgotPassword", validateForgotPasswordInput, forgotPassword);
 router.post("/forgotPassword/:id", validateResetPasswordInput, resetPassword);
 router.post("/registerFace", authenticateUser, registerFace);
 router.post("/verifyFace", authenticateUser, verifyFace);
+router.post("/resendOtp", validateResendOtpInput, resendOtp);
 
 export default router;

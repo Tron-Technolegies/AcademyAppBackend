@@ -210,3 +210,29 @@ export const verifyFace = async (req, res) => {
     threshold,
   });
 };
+
+export const resendOtp = async (req, res) => {
+  const { email } = req.body;
+  if (!email) throw new BadRequestError("Email is required");
+
+  const user = await User.findOne({ email });
+  if (!user) throw new NotFoundError("User not found");
+
+  const code = Math.floor(1000 + Math.random() * 9000);
+  user.otp = code;
+  await user.save();
+
+  const mailOptions = {
+    from: {
+      name: "Tron Academy App",
+      address: process.env.NODEMAILER_EMAIL,
+    },
+    to: user.email,
+    subject: "Resend Verification Code",
+    text: `You requested a new verification code for your Tron Academy account. Your new OTP is ${code}`,
+  };
+
+  await sendMail(transporter, mailOptions);
+
+  res.status(200).json({ message: "OTP has been resent to your email" });
+};

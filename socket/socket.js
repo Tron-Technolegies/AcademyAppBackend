@@ -67,6 +67,7 @@ io.on("connection", (socket) => {
         message,
         type: "text",
         timestamp: newMessage.createdAt,
+        zz,
       });
     } catch (error) {
       console.error("Error sending message:", error);
@@ -110,6 +111,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendVoice", async (data) => {
+    console.log("Received voice data:", data); // Check data received
+
     try {
       const { subCommunityId, user, audioBuffer, audioName } = data;
       const buffer = new Buffer.from(audioBuffer);
@@ -136,6 +139,7 @@ io.on("connection", (socket) => {
         type: "audio",
         timestamp: newMessage.createdAt,
       });
+      console.log("Message broadcasted successfully.");
     } catch (error) {
       console.error("Error sending voice:", error);
       socket.emit("error", "Failed to send voice message");

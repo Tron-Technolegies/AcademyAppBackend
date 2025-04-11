@@ -180,3 +180,11 @@ export const validatePlanInput = withValidationErrors([
   body("price").notEmpty().withMessage("price is not found"),
   body("features").notEmpty().withMessage("features is required"),
 ]);
+
+export const validateResendOtpInput = withValidationErrors([
+  body("email")
+    .notEmpty()
+    .withMessage("Email is required")
+    .isEmail()
+    .withMessage("invalid email format"),
+]);

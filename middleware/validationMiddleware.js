@@ -188,3 +188,23 @@ export const validateResendOtpInput = withValidationErrors([
     .isEmail()
     .withMessage("invalid email format"),
 ]);
+
+export const validateEnrollCourseInput = withValidationErrors([
+  body("Id")
+    .notEmpty()
+    .withMessage("course Id is required")
+    .isMongoId()
+    .withMessage("Invalid Course Id format"),
+]);
+
+export const validateCourseProgressInput = withValidationErrors([
+  body("videoId")
+    .notEmpty()
+    .withMessage("video Id is required")
+    .isMongoId()
+    .withMessage("Invalid video Id format"),
+]);
+
+export const validateManagePlanInput = withValidationErrors([
+  body("planType").notEmpty().withMessage("plan type is required"),
+]);

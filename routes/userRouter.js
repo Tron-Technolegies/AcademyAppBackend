@@ -16,6 +16,7 @@ import {
   updateUserDetails,
 } from "../controllers/userController.js";
 import {
+  validatePlanInput,
   validateSaveVideoInput,
   validateUpdateDetailsInput,
   validateUpdatePasswordInput,
@@ -36,6 +37,6 @@ router.patch("/removeFromHistory", validateSaveVideoInput, removeFromHistory);
 router.patch("/updatePassword", validateUpdatePasswordInput, updatePassword);
 router.get("/getAllSavedVideo", getAllSavedVideo);
 router.get("/getAllHistory", getAllHistory);
-router.patch("/subscription", managePlan);
+router.patch("/subscription", validatePlanInput, managePlan);
 
 export default router;

@@ -27,8 +27,12 @@ export const validateRegisterInput = withValidationErrors([
   body("password")
     .notEmpty()
     .withMessage("Password is required")
-    .isAlphanumeric()
-    .withMessage("password must contain letters and numbers"),
+    .isLength({ min: 8 })
+    .withMessage("password must be at least 8 characters long")
+    .matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]+$/)
+    .withMessage(
+      "password must contain at least one letter,one number, and can include special characters"
+    ),
   body("email")
     .notEmpty()
     .withMessage("Email is required")

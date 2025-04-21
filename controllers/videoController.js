@@ -1,15 +1,33 @@
 import { NotFoundError } from "../errors/customErrors.js";
 import Video from "../models/VideoModel.js";
 import Module from "../models/ModuleModel.js";
+import {
+  getYouTubeVideoId,
+  getYouTubeVideoDuration,
+  parseISODuration,
+} from "../utils/youtubeFunc.js";
 
 export const addVideo = async (req, res) => {
   const { videoName, videoURL, relatedModule, relatedCourse } = req.body;
+
+  // Extract the video ID from the YouTube URL
+  const videoId = getYouTubeVideoId(videoURL);
+  if (!videoId) {
+    return res.status(400).json({ message: "Invalid YouTube URL" });
+  }
+
+  // Fetch the duration of the video from the YouTube API
+  const isoDuration = await getYouTubeVideoDuration(videoId);
+  const duration = parseISODuration(isoDuration); // Convert ISO duration to readable format
+
   const newVideo = new Video({
     videoName: videoName,
     videoURL: videoURL,
+    duration: duration,
     relatedModule: relatedModule,
     relatedCourse: relatedCourse,
   });
+
   await newVideo.save();
 
   const module = await Module.findById(relatedModule);
@@ -27,12 +45,14 @@ export const getAllVideo = async (req, res) => {
 };
 
 export const updateVideos = async (req, res) => {
-  const { videoName, videoURL, relatedModule, relatedCourse } = req.body;
+  const { videoName, videoURL, relatedModule, relatedCourse, duration } =
+    req.body;
   const { id } = req.params;
   const video = await Video.findById(id);
   if (!video) throw new NotFoundError("videos not found");
   video.videoName = videoName;
   video.videoURL = videoURL;
+  video.duration = duration;
   video.relatedModule = relatedModule;
   video.relatedCourse = relatedCourse;
   await video.save();

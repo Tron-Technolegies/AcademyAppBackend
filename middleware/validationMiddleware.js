@@ -212,3 +212,13 @@ export const validateCourseProgressInput = withValidationErrors([
 export const validateManagePlanInput = withValidationErrors([
   body("planType").notEmpty().withMessage("plan type is required"),
 ]);
+
+export const validateChatRoomInput = withValidationErrors([
+  body("chatRoomName").notEmpty().withMessage("chat room name is required"),
+  body("relatedCommunity")
+    .notEmpty()
+    .withMessage("Related community is required"),
+  body("relatedSubCommunity")
+    .notEmpty()
+    .withMessage("related sub-community is required"),
+]);

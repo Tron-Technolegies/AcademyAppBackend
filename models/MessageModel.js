@@ -1,5 +1,6 @@
 import mongoose, { model, Schema } from "mongoose";
 import { type } from "os";
+import ChatRoom from "./ChatRoomModel.js";
 
 const MessageSchema = new Schema(
   {
@@ -32,6 +33,10 @@ const MessageSchema = new Schema(
     type: {
       type: String,
       enum: ["text", "image", "voice", "audio", "file"],
+    },
+    chatRoomId: {
+      type: mongoose.Types.ObjectId,
+      ref: ChatRoom,
     },
   },
   { timestamps: true }

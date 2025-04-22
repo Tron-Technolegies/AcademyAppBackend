@@ -11,6 +11,9 @@ const VideoSchema = new Schema(
       type: String,
       required: true,
     },
+    duration: {
+      type: String,
+    },
 
     relatedModule: {
       type: mongoose.Types.ObjectId,

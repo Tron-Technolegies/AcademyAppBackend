@@ -31,7 +31,7 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log("a user connected: ", socket.id);
 
-  socket.on("joinCommunity", async (chatRoomId) => {
+  socket.on("joinChatRoom", async (chatRoomId) => {
     try {
       socket.join(chatRoomId);
       console.log(`User ${socket.id} joined chat room ${chatRoomId}`);

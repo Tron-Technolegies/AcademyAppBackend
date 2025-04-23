@@ -31,28 +31,28 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log("a user connected: ", socket.id);
 
-  socket.on("joinCommunity", async (subCommunityId) => {
+  socket.on("joinChatRoom", async (chatRoomId) => {
     try {
-      socket.join(subCommunityId);
-      console.log(`User ${socket.id} joined sub-community ${subCommunityId}`);
+      socket.join(chatRoomId);
+      console.log(`User ${socket.id} joined chat room ${chatRoomId}`);
 
-      const messages = await Message.find({ subCommunityId })
+      const messages = await Message.find({ chatRoomId })
         .populate("user")
         .sort({ timeStamp: 1 });
 
       socket.emit("previousMessages", messages);
     } catch (error) {
-      console.error("Error joining community:", error);
-      socket.emit("error", "Failed to join community");
+      console.error("Error joining chat room:", error);
+      socket.emit("error", "Failed to join chat room");
     }
   });
 
   socket.on("sendMessage", async (data) => {
     try {
-      const { subCommunityId, user, message } = data;
+      const { chatRoomId, user, message } = data;
       // Create new text message in database
       const newMessage = new Message({
-        subCommunityId,
+        chatRoomId,
         user,
         message,
         type: "text",
@@ -61,7 +61,7 @@ io.on("connection", (socket) => {
       console.log("Message saved:", newMessage);
 
       // Broadcast message to all in the sub-community
-      io.to(subCommunityId).emit("receiveMessage", {
+      io.to(chatRoomId).emit("receiveMessage", {
         _id: newMessage._id,
         user,
         message,
@@ -77,7 +77,7 @@ io.on("connection", (socket) => {
 
   socket.on("sendImage", async (data) => {
     try {
-      const { subCommunityId, user, imageBuffer, imageName } = data;
+      const { chatRoomId, user, imageBuffer, imageName } = data;
 
       // Upload image to Cloudinary
       const buffer = Buffer.from(imageBuffer);
@@ -88,7 +88,7 @@ io.on("connection", (socket) => {
 
       // Save message with image URL to database
       const newMessage = new Message({
-        subCommunityId,
+        chatRoomId,
         user,
         imageUrl: result.secure_url,
         type: "image",
@@ -97,7 +97,7 @@ io.on("connection", (socket) => {
       console.log(result.secure_url);
 
       // Broadcast image message
-      io.to(subCommunityId).emit("receiveMessage", {
+      io.to(chatRoomId).emit("receiveMessage", {
         _id: newMessage._id,
         user,
         imageUrl: result.secure_url,
@@ -114,7 +114,7 @@ io.on("connection", (socket) => {
     console.log("Received voice data:", data); // Check data received
 
     try {
-      const { subCommunityId, user, audioBuffer, audioName } = data;
+      const { chatRoomId, user, audioBuffer, audioName } = data;
       const buffer = new Buffer.from(audioBuffer);
       const file = formatChatImage(buffer, audioName);
 
@@ -124,7 +124,7 @@ io.on("connection", (socket) => {
       });
 
       const newMessage = new Message({
-        subCommunityId,
+        chatRoomId,
         user,
         audioUrl: result.secure_url,
         type: "audio",
@@ -132,7 +132,7 @@ io.on("connection", (socket) => {
 
       await newMessage.save();
 
-      io.to(subCommunityId).emit("receiveMessage", {
+      io.to(chatRoomId).emit("receiveMessage", {
         _id: newMessage._id,
         user,
         audioUrl: result.secure_url,
@@ -148,7 +148,7 @@ io.on("connection", (socket) => {
 
   socket.on("sendFile", async (data) => {
     try {
-      const { subCommunityId, user, fileBuffer, fileName, mimeType } = data;
+      const { chatRoomId, user, fileBuffer, fileName, mimeType } = data;
 
       const buffer = Buffer.from(fileBuffer);
       const file = formatChatImage(buffer, fileName); // reuse your helper or rename if needed
@@ -160,7 +160,7 @@ io.on("connection", (socket) => {
       });
 
       const newMessage = new Message({
-        subCommunityId,
+        chatRoomId,
         user,
         fileUrl: result.secure_url,
         fileName,
@@ -169,7 +169,7 @@ io.on("connection", (socket) => {
 
       await newMessage.save();
 
-      io.to(subCommunityId).emit("receiveMessage", {
+      io.to(chatRoomId).emit("receiveMessage", {
         _id: newMessage._id,
         user,
         fileUrl: result.secure_url,

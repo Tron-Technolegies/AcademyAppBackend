@@ -194,7 +194,7 @@ export const validateResendOtpInput = withValidationErrors([
 ]);
 
 export const validateEnrollCourseInput = withValidationErrors([
-  body("Id")
+  body("id")
     .notEmpty()
     .withMessage("course Id is required")
     .isMongoId()

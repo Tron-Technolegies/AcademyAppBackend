@@ -70,5 +70,3 @@ export const joinCommunity = async (req, res) => {
 
   res.status(200).json({ message: "Successfully joined the community" });
 };
-
-ge;

@@ -6,6 +6,7 @@ import {
   deleteCommunity,
   getAllCommunity,
   getSingleCommunity,
+  joinCommunity,
   updateCommunity,
 } from "../controllers/communityController.js";
 
@@ -25,4 +26,6 @@ router.delete(
   isAdmin,
   deleteCommunity
 );
+router.post("/joinCommunity", joinCommunity);
+
 export default router;

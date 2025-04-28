@@ -23,6 +23,11 @@ const VideoSchema = new Schema(
       type: mongoose.Types.ObjectId,
       ref: "Course",
     },
+    comments: [
+      {
+        type: mongoose.Types.ObjectId,
+      },
+    ],
   },
   { timestamps: true }
 );

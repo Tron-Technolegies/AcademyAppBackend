@@ -8,6 +8,7 @@ import {
   getSingleCommunity,
   joinCommunity,
   updateCommunity,
+  getMembersByCommunity,
 } from "../controllers/communityController.js";
 
 const router = Router();
@@ -27,5 +28,6 @@ router.delete(
   deleteCommunity
 );
 router.post("/joinCommunity", joinCommunity);
+router.get("/getMembersByCommunity/:id", getMembersByCommunity);
 
 export default router;

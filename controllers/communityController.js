@@ -70,3 +70,12 @@ export const joinCommunity = async (req, res) => {
 
   res.status(200).json({ message: "Successfully joined the community" });
 };
+
+export const getMembersByCommunity = async (req, res) => {
+  const { id } = req.params;
+  const community = await Community.findById(id);
+  if (!community) {
+    res.status(400).json({ message: "Community not found" });
+  }
+  res.status(200).json(community.communityMembers);
+};

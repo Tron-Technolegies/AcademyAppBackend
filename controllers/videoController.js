@@ -6,6 +6,7 @@ import {
   getYouTubeVideoDuration,
   parseISODuration,
 } from "../utils/youtubeFunc.js";
+import User from "../models/UserModel.js";
 
 export const addVideo = async (req, res) => {
   const { videoName, videoURL, relatedModule, relatedCourse } = req.body;
@@ -95,4 +96,33 @@ export const getVideoByModule = async (req, res) => {
   const videos = await Video.find({ relatedModule: moduleId });
   if (!videos) throw new NotFoundError("videos not found ");
   res.status(200).json(videos);
+};
+
+export const addCommentToVideo = async (req, res) => {
+  const { id } = req.params;
+  const { text } = req.body;
+  const { userId } = req.user; // Get userId from the JWT token
+
+  // Check if user exists
+  const user = await User.findById(userId);
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  // Check if video exists
+  const video = await Video.findById(id);
+  if (!video) return res.status(404).json({ message: "Video not found" });
+
+  // Add comment to the video
+  const newComment = {
+    user: user._id,
+    text: text,
+    createdAt: new Date(),
+  };
+  video.comments.push(newComment);
+  await video.save();
+
+  // Respond with the updated comments
+  res.status(200).json({
+    message: "Comment added successfully",
+    comments: video.comments,
+  });
 };

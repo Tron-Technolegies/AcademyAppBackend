@@ -1,5 +1,19 @@
 import mongoose, { model, Schema } from "mongoose";
 
+const commentSchema = new Schema({
+  user: {
+    type: mongoose.Types.ObjectId,
+    ref: "User",
+  },
+  text: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
 const VideoSchema = new Schema(
   {
     videoName: {
@@ -23,11 +37,7 @@ const VideoSchema = new Schema(
       type: mongoose.Types.ObjectId,
       ref: "Course",
     },
-    comments: [
-      {
-        type: mongoose.Types.ObjectId,
-      },
-    ],
+    comments: [commentSchema],
   },
   { timestamps: true }
 );

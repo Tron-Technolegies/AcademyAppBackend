@@ -62,7 +62,10 @@ export const updateVideos = async (req, res) => {
 
 export const getSingleVideo = async (req, res) => {
   const { id } = req.params;
-  const video = await Video.findById(id);
+  const video = await Video.findById(id).populate(
+    "comments.user",
+    "firstName profilePicUrl"
+  );
   if (!video) throw new NotFoundError("videos not found");
   res.status(200).json(video);
 };
@@ -120,13 +123,9 @@ export const addCommentToVideo = async (req, res) => {
   video.comments.push(newComment);
   await video.save();
 
-  const updatedVideo = await Video.findById(video._id).populate(
-    "comments.user"
-  );
-
   // Respond with the updated comments
   res.status(200).json({
     message: "Comment added successfully",
-    comments: updatedVideo.comments,
+    comments: video.comments,
   });
 };

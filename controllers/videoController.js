@@ -120,9 +120,13 @@ export const addCommentToVideo = async (req, res) => {
   video.comments.push(newComment);
   await video.save();
 
+  const updatedVideo = await Video.findById(video._id).populate(
+    "comments.user"
+  );
+
   // Respond with the updated comments
   res.status(200).json({
     message: "Comment added successfully",
-    comments: video.comments,
+    comments: updatedVideo.comments,
   });
 };

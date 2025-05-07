@@ -1,5 +1,10 @@
+import pkg from "agora-access-token";
+const { RtcTokenBuilder, RtcRole } = pkg;
+
 import { NotFoundError } from "../errors/customErrors.js";
 import Class from "../models/ClassModel.js";
+import User from "../models/UserModel.js";
+import generateAgoraToken from "../utils/agora/agoraToken.js";
 
 export const addClass = async (req, res) => {
   const { className, date, time, instructor, course } = req.body;
@@ -48,4 +53,36 @@ export const deleteClass = async (req, res) => {
   const classes = await Class.findByIdAndDelete(id);
   if (!classes) throw new NotFoundError("classes not found");
   res.status(200).json("deleted successfully");
+};
+
+export const joinClassSession = async (req, res) => {
+  const classId = req.params.id;
+  const { userId } = req.body;
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  const classSession = await Class.findById(classId);
+
+  if (!classSession) {
+    return res.status(404).json({ error: "Class not found" });
+  }
+
+  const channelName = `class-${classSession._id}`;
+  console.log("Generated channel name:", channelName);
+
+  // Assign role based on the user's role (instructor = PUBLISHER, student = SUBSCRIBER)
+  const role =
+    user.role === "instructor" ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER;
+  console.log("Assigned role:", role);
+
+  // Generate Agora token using the user._id and class channel name
+  const token = generateAgoraToken(channelName, user._id); // Pass user._id here
+  console.log("Generated Agora token:", token);
+
+  // Return the token and channel name to the frontend
+  res.json({ token, channelName });
 };

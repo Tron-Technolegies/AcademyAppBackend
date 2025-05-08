@@ -6,6 +6,7 @@ import {
   deleteClass,
   getAllClass,
   getSingleClass,
+  joinClassSession,
   updateClass,
 } from "../controllers/classController.js";
 
@@ -15,4 +16,5 @@ router.get("/getAllClass", getAllClass);
 router.patch("/updateClass/:id", validateClassInput, isAdmin, updateClass);
 router.get("/getAllClass/:id", getSingleClass);
 router.delete("/deleteClass/:id", isAdmin, deleteClass);
+router.post("/joinClass/:id", joinClassSession);
 export default router;

@@ -1,48 +1,50 @@
+// utils/agoraTokenGenerator.js
 import pkg from "agora-access-token";
 const { RtcTokenBuilder, RtcRole } = pkg;
 
-const generateAgoraToken = (channelName, userId) => {
+const generateAgoraToken = (channelName, userId, userRole = "subscriber") => {
+  // 1. Validate environment variables
   const appID = process.env.AGORA_APP_ID;
   const appCertificate = process.env.AGORA_APP_CERTIFICATE;
 
-  console.log("App ID:", appID);
-  console.log("App Certificate:", appCertificate);
-  console.log("Channel Name:", channelName);
-  console.log("User ID:", userId);
+  console.assert(appID, "AGORA_APP_ID is required");
+  console.assert(appCertificate, "AGORA_APP_CERTIFICATE is required");
 
-  if (!appID || !appCertificate) {
-    throw new Error(
-      "AGORA_APP_ID or AGORA_APP_CERTIFICATE is not defined in the environment variables"
-    );
+  // 2. Validate inputs
+  if (!channelName?.trim()) {
+    throw new Error(`Invalid channel name: ${channelName}`);
   }
 
-  if (!channelName || typeof channelName !== "string") {
-    throw new Error("Invalid channelName provided");
+  if (!userId?.trim()) {
+    throw new Error(`Invalid user ID: ${userId}`);
   }
 
-  // Convert userId to a number (UID)
-  const uid = parseInt(userId, 10);
-  if (isNaN(uid)) {
-    throw new Error("Invalid userId provided. userId must be a valid number.");
-  }
+  // 3. Configure token
+  const role =
+    userRole.toLowerCase() === "instructor"
+      ? RtcRole.PUBLISHER
+      : RtcRole.SUBSCRIBER;
 
-  const role = RtcRole.PUBLISHER; // or RtcRole.SUBSCRIBER
-  const expireTime = 3600; // Token expiry time in seconds
+  const expireTime = 3600;
+  const privilegeExpireTime = Math.floor(Date.now() / 1000) + expireTime;
 
-  const currentTime = Math.floor(Date.now() / 1000); // Current Unix timestamp
-  const privilegeExpireTime = currentTime + expireTime; // Expiry time for the privilege
-
-  // Generate the token with the Agora SDK
-  const token = RtcTokenBuilder.buildTokenWithUid(
+  // 4. Generate token (using string UID approach)
+  const token = RtcTokenBuilder.buildTokenWithAccount(
     appID,
     appCertificate,
     channelName,
-    uid,
+    userId.toString(),
     role,
     privilegeExpireTime
   );
 
-  console.log(`Generated token: ${token}`);
+  console.log("Generated Agora token:", {
+    channelName,
+    userId,
+    role,
+    tokenPreview: token.slice(0, 20) + "...",
+  });
+
   return token;
 };
 

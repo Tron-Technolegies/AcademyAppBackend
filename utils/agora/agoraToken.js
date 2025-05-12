@@ -81,7 +81,7 @@ const generateAgoraToken = (channelName, userId, userRole = "subscriber") => {
 
   // 4. Generate token (using string UID approach)
   const UID = parseInt(uidHash(userId));
-  const token = RtcTokenBuilder.buildTokenWithAccount(
+  const token = RtcTokenBuilder.buildTokenWithUid(
     appID,
     appCertificate,
     channelName,

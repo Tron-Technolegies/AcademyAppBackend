@@ -4,7 +4,7 @@ const { RtcTokenBuilder, RtcRole } = pkg;
 import { NotFoundError } from "../errors/customErrors.js";
 import Class from "../models/ClassModel.js";
 import User from "../models/UserModel.js";
-import generateAgoraToken from "../utils/agora/agoraToken.js";
+import generateAgoraToken, { uidHash } from "../utils/agora/agoraToken.js";
 
 export const addClass = async (req, res) => {
   const { className, date, time, instructor, course } = req.body;
@@ -112,7 +112,7 @@ export const joinClassSession = async (req, res) => {
   res.status(200).json({
     token,
     channelName,
-    uid: user._id,
+    uid: uidHash(user._id.toString()),
     role: user.role,
     classId: classSession._id,
     expiresIn: 3600,

@@ -80,18 +80,19 @@ const generateAgoraToken = (channelName, userId, userRole = "subscriber") => {
   const privilegeExpireTime = Math.floor(Date.now() / 1000) + expireTime;
 
   // 4. Generate token (using string UID approach)
+  const UID = parseInt(uidHash(userId));
   const token = RtcTokenBuilder.buildTokenWithAccount(
     appID,
     appCertificate,
     channelName,
-    userId.toString(),
+    UID,
     role,
     privilegeExpireTime
   );
 
   console.log("Generated Agora token:", {
     channelName,
-    userId,
+    UID,
     role,
     tokenPreview: token.slice(0, 20) + "...",
   });
@@ -100,3 +101,12 @@ const generateAgoraToken = (channelName, userId, userRole = "subscriber") => {
 };
 
 export default generateAgoraToken;
+
+export function uidHash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    hash = hash & hash; // convert to 32bit integer
+  }
+  return Math.abs(hash % 1000000); // Ensure it's positive and not too large
+}

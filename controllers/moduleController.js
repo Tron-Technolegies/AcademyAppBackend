@@ -12,7 +12,11 @@ export const addModule = async (req, res) => {
 };
 
 export const getAllModule = async (req, res) => {
-  const modules = await Module.find();
+  const modules = await Module.find().populate({
+    path: "relatedCourse",
+    populate: { path: "courseCategory" },
+  });
+
   if (!modules) throw new NotFoundError("modules not found");
   res.status(200).json(modules);
 };
@@ -30,7 +34,10 @@ export const updateModule = async (req, res) => {
 
 export const getSingleModule = async (req, res) => {
   const { id } = req.params;
-  const module = await Module.findById(id);
+  const module = await Module.findById(id).populate({
+    path: "relatedCourse",
+    populate: { path: "courseCategory" },
+  });
   if (!module) throw new NotFoundError("module not found");
   res.status(200).json(module);
 };

@@ -15,7 +15,9 @@ export const addChatRoom = async (req, res) => {
 };
 
 export const getAllChatRoom = async (req, res) => {
-  const chatRooms = await ChatRoom.find();
+  const chatRooms = await ChatRoom.find()
+    .populate("relatedCommunity", "communityName")
+    .populate("relatedSubCommunity", "subCommunityName");
   if (!chatRooms) throw new NotFoundError("chat rooms not found");
   res.status(200).json(chatRooms);
 };

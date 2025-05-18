@@ -2,6 +2,7 @@ import Course from "../models/CourseModel.js";
 import { BadRequestError, NotFoundError } from "../errors/customErrors.js";
 import User from "../models/UserModel.js";
 import Video from "../models/VideoModel.js";
+import Category from "../models/CategoryModel.js";
 
 export const addCourse = async (req, res) => {
   const { courseName, courseCategory, instructor, courseOverView } = req.body;
@@ -25,7 +26,9 @@ export const getAllCourse = async (req, res) => {
       $options: "i",
     };
   }
-  const courses = await Course.find(queryObject).populate("instructor");
+  const courses = await Course.find(queryObject)
+    .populate("instructor")
+    .populate("courseCategory", "categoryName");
   if (!courses) throw new NotFoundError("course not found");
   res.status(200).json(courses);
 };
@@ -33,7 +36,7 @@ export const getAllCourse = async (req, res) => {
 export const updateCourse = async (req, res) => {
   const { courseName, courseCategory, instructor, courseOverView } = req.body;
   const { id } = req.params;
-  const course = await Category.findById(id);
+  const course = await Course.findById(id);
   if (!course) throw new NotFoundError("course not found");
   course.courseName = courseName;
   course.courseCategory = courseCategory;

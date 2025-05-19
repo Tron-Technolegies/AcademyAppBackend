@@ -40,8 +40,13 @@ export const addVideo = async (req, res) => {
 };
 
 export const getAllVideo = async (req, res) => {
-  const videos = await Video.find();
-  if (!videos) throw new NotFoundError("videos not found");
+  const videos = await Video.find()
+    .populate("relatedModule", "moduleName")
+    .populate("relatedCourse", "courseName");
+
+  if (!videos || videos.length === 0)
+    throw new NotFoundError("videos not found");
+
   res.status(200).json(videos);
 };
 

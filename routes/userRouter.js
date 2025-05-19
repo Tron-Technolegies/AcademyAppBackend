@@ -6,6 +6,7 @@ import {
   clearHistory,
   getAllHistory,
   getAllSavedVideo,
+  getAllUser,
   getUserInfo,
   managePlan,
   removeFromHistory,
@@ -38,5 +39,5 @@ router.patch("/updatePassword", validateUpdatePasswordInput, updatePassword);
 router.get("/getAllSavedVideo", getAllSavedVideo);
 router.get("/getAllHistory", getAllHistory);
 router.patch("/subscription", validatePlanInput, managePlan);
-
+router.get("/getAllUser", getAllUser);
 export default router;

@@ -12,7 +12,10 @@ export const addSubCommunity = async (req, res) => {
 };
 
 export const getAllSubCommunity = async (req, res) => {
-  const subCommunity = await SubCommunity.find();
+  const subCommunity = await SubCommunity.find().populate(
+    "relatedCommunity",
+    "communityName"
+  );
   if (!subCommunity) throw new NotFoundError("no community found");
   res.status(200).json(subCommunity);
 };
@@ -30,7 +33,10 @@ export const updateSubCommunity = async (req, res) => {
 
 export const getSingleSubCommunity = async (req, res) => {
   const { id } = req.params;
-  const subCommunity = await SubCommunity.findById(id);
+  const subCommunity = await SubCommunity.findById(id).populate(
+    "relatedCommunity",
+    "communityName"
+  );
   if (!subCommunity) throw new NotFoundError("no community found");
   res.status(200).json(subCommunity);
 };

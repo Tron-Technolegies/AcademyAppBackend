@@ -107,8 +107,21 @@ export const validateCourseInput = withValidationErrors([
 ]);
 
 export const validateInstructorInput = withValidationErrors([
-  body("instructorName").notEmpty().withMessage("instructor name is required"),
-  body("instructorRole").notEmpty().withMessage("instructor role is required"),
+  body("fullName").notEmpty().withMessage("Full name is required"),
+
+  body("email").isEmail().withMessage("Valid email is required"),
+
+  body("password")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters"),
+
+  body("phoneNumber").notEmpty().withMessage("Phone number is required"),
+
+  body("gender")
+    .isIn(["male", "female", "other"])
+    .withMessage("Gender must be one of: male, female, other"),
+
+  body("designation").notEmpty().withMessage("Designation is required"),
 ]);
 
 export const validateModuleInput = withValidationErrors([

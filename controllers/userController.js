@@ -15,7 +15,6 @@ export const addUserDetails = async (req, res) => {
   user.dateOfBirth = new Date(`${year}-${month}-${day}T00:00:00Z`);
   user.status = role;
   user.gender = gender;
-
   user.address = address;
   await user.save();
   res.status(200).json({ message: "successfully added details" });
@@ -167,4 +166,10 @@ export const managePlan = async (req, res) => {
   }
   await user.save();
   res.status(200).json({ msg: "success" });
+};
+
+export const getAllUser = async (req, res) => {
+  const students = await User.find({ role: "student" });
+  if (!students) throw NotFoundError("students not found");
+  res.status(200).json(students);
 };

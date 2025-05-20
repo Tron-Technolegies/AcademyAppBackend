@@ -3,7 +3,7 @@ import mongoose, { model, Schema } from "mongoose";
 const CategorySchema = new Schema(
   {
     categoryName: {
-      type: "String",
+      type: String,
       required: true,
     },
     allCourses: [

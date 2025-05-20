@@ -108,8 +108,15 @@ export const validateCourseInput = withValidationErrors([
 
 export const validateInstructorInput = withValidationErrors([
   body("fullName").notEmpty().withMessage("Full name is required"),
-
-  body("email").isEmail().withMessage("Valid email is required"),
+  body("email")
+    .notEmpty()
+    .withMessage("Email is required")
+    .isEmail()
+    .withMessage("invalid email format")
+    .custom(async (email) => {
+      const user = await User.findOne({ email: email });
+      if (user) throw new BadRequestError("Email already exists");
+    }),
 
   body("password")
     .isLength({ min: 6 })
@@ -118,8 +125,33 @@ export const validateInstructorInput = withValidationErrors([
   body("phoneNumber").notEmpty().withMessage("Phone number is required"),
 
   body("gender")
-    .isIn(["male", "female", "other"])
-    .withMessage("Gender must be one of: male, female, other"),
+    .isIn(["male", "female"])
+    .withMessage("Gender must be one of: male, female"),
+
+  body("designation").notEmpty().withMessage("Designation is required"),
+]);
+export const validateUpdateInstructorInput = withValidationErrors([
+  body("fullName").notEmpty().withMessage("Full name is required"),
+
+  body("email")
+    .notEmpty()
+    .withMessage("Email is required")
+    .isEmail()
+    .withMessage("invalid email format")
+    .custom(async (email) => {
+      const user = await User.findOne({ email: email });
+      if (user) throw new BadRequestError("Email already exists");
+    }),
+
+  body("password")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters"),
+
+  body("phoneNumber").notEmpty().withMessage("Phone number is required"),
+
+  body("gender")
+    .isIn(["male", "female"])
+    .withMessage("Gender must be one of: male, female"),
 
   body("designation").notEmpty().withMessage("Designation is required"),
 ]);

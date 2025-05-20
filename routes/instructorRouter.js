@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { validateInstructorInput } from "../middleware/validationMiddleware.js";
+import {
+  validateInstructorInput,
+  validateUpdateInstructorInput,
+} from "../middleware/validationMiddleware.js";
 import {
   addInstructor,
   deleteInstructor,
@@ -14,7 +17,7 @@ router.post("/addInstructor", validateInstructorInput, isAdmin, addInstructor);
 router.get("/getInstructor", getAllInstructor);
 router.patch(
   "/updateInstructor/:id",
-  validateInstructorInput,
+  validateUpdateInstructorInput,
   isAdmin,
   updateInstructor
 );

@@ -5,6 +5,7 @@ import {
   // faceRecognition,
   loginUser,
   logout,
+  logoutAdmin,
   registerFace,
   registerUser,
   resendOtp,
@@ -30,6 +31,7 @@ router.post("/register", validateRegisterInput, registerUser);
 router.post("/login", validateLoginInput, loginUser);
 router.post("/verify", validateOtpInput, authenticateUser, verifyOtp);
 router.post("/logout", logout);
+router.post("/logoutAdmin", logoutAdmin);
 
 router.get("/resetPassword/:id", sendResetPassword);
 router.post("/forgotPassword", validateForgotPasswordInput, forgotPassword);

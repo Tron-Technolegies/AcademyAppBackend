@@ -169,7 +169,18 @@ export const managePlan = async (req, res) => {
 };
 
 export const getAllUser = async (req, res) => {
-  const students = await User.find({ role: "student" });
-  if (!students) throw NotFoundError("students not found");
+  const { search } = req.query;
+  const query = { role: "student" };
+
+  if (search) {
+    query.$or = [
+      { firstName: { $regex: search, $options: "i" } },
+      { lastName: { $regex: search, $options: "i" } },
+      { email: { $regex: search, $options: "i" } },
+      { phoneNumber: { $regex: search, $options: "i" } },
+    ];
+  }
+  const students = await User.find(query).select("-password");
+  if (!students) throw new NotFoundError("students not found");
   res.status(200).json(students);
 };

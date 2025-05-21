@@ -34,7 +34,7 @@ export const getAllInstructor = async (req, res) => {
   }
   const instructors = await User.find(query).select("-password");
   if (!instructors) throw new NotFoundError("instructor not found");
-  res.status(201).json(instructors);
+  res.status(200).json(instructors);
 };
 
 export const updateInstructor = async (req, res) => {

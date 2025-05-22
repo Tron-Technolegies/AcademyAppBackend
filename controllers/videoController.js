@@ -40,7 +40,15 @@ export const addVideo = async (req, res) => {
 };
 
 export const getAllVideo = async (req, res) => {
-  const videos = await Video.find()
+  const { search } = req.query;
+  const queryObject = {};
+  if (search && search !== "") {
+    queryObject.videoName = {
+      $regex: search,
+      $options: "i",
+    };
+  }
+  const videos = await Video.find(queryObject)
     .populate("relatedModule", "moduleName")
     .populate("relatedCourse", "courseName");
 

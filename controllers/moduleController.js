@@ -22,7 +22,7 @@ export const getAllModule = async (req, res) => {
     };
   }
 
-  const modules = await Module.find().populate({
+  const modules = await Module.find(queryObject).populate({
     path: "relatedCourse",
     populate: { path: "courseCategory" },
   });

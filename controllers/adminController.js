@@ -13,13 +13,14 @@ export const getUserStats = async (req, res, next) => {
     subscriptionType: "subscriber",
   });
 
-  if (!newUserCount && !activeUserCount && !subscriberCount) {
-    throw new NotFoundError("No users found");
-  }
+  const newUsers = await User.find({
+    createdAt: { $gte: thirtyDaysAgo },
+  }).select("firstName username phoneNumber createdAt");
 
   return res.status(200).json({
     newUserCount,
     activeUserCount,
     subscriberCount,
+    newUsers,
   });
 };

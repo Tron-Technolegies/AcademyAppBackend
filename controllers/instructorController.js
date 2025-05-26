@@ -38,8 +38,7 @@ export const getAllInstructor = async (req, res) => {
 };
 
 export const updateInstructor = async (req, res) => {
-  const { fullName, email, password, phoneNumber, gender, designation } =
-    req.body;
+  const { fullName, email, phoneNumber, gender, designation } = req.body;
   const { id } = req.params;
   const instructor = await User.findById(id);
   if (!instructor) throw new NotFoundError("instructor not found");
@@ -48,7 +47,7 @@ export const updateInstructor = async (req, res) => {
   instructor.email = email;
   instructor.phoneNumber = phoneNumber;
   instructor.gender = gender;
-  instructor.password = await hashPassword(password);
+
   await instructor.save();
   res.status(200).json({ message: "Instructor updated successfully" });
 };

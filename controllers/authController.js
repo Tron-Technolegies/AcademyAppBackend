@@ -236,3 +236,11 @@ export const resendOtp = async (req, res) => {
 
   res.status(200).json({ message: "OTP has been resent to your email" });
 };
+
+export const logoutAdmin = async (req, res) => {
+  res.cookie("token", "logout", {
+    httpOnly: true,
+    expires: new Date(Date.now()),
+  });
+  res.status(200).json({ message: "successfully logged out" });
+};

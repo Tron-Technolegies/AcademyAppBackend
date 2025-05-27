@@ -12,7 +12,16 @@ export const addSubCommunity = async (req, res) => {
 };
 
 export const getAllSubCommunity = async (req, res) => {
-  const subCommunity = await SubCommunity.find().populate(
+  const { search } = req.query;
+
+  const queryObject = {};
+  if (search && search !== "") {
+    queryObject.subCommunityName = {
+      $regex: search,
+      $options: "i",
+    };
+  }
+  const subCommunity = await SubCommunity.find(queryObject).populate(
     "relatedCommunity",
     "communityName"
   );

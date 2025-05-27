@@ -108,20 +108,74 @@ export const validateCourseInput = withValidationErrors([
 
 export const validateInstructorInput = withValidationErrors([
   body("fullName").notEmpty().withMessage("Full name is required"),
-
-  body("email").isEmail().withMessage("Valid email is required"),
+  body("email")
+    .notEmpty()
+    .withMessage("Email is required")
+    .isEmail()
+    .withMessage("invalid email format")
+    .custom(async (email) => {
+      const user = await User.findOne({ email: email });
+      if (user) throw new BadRequestError("Email already exists");
+    }),
 
   body("password")
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters"),
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters")
+    .matches(/[A-Z]/)
+    .withMessage("Password must contain at least one uppercase letter")
+    .matches(/[^A-Za-z0-9]/)
+    .withMessage("Password must contain at least one special character"),
 
-  body("phoneNumber").notEmpty().withMessage("Phone number is required"),
+  body("phoneNumber")
+    .trim()
+    .notEmpty()
+    .withMessage("Phone number is required")
+    .custom(async (phoneNumber) => {
+      const user = await User.findOne({ phoneNumber });
+      if (user) {
+        throw new BadRequestError("Phone number already exists");
+      }
+    }),
 
   body("gender")
-    .isIn(["male", "female", "other"])
-    .withMessage("Gender must be one of: male, female, other"),
+    .isIn(["male", "female"])
+    .withMessage("Gender must be one of: male, female"),
 
   body("designation").notEmpty().withMessage("Designation is required"),
+]);
+
+export const validateUpdateInstructorInput = withValidationErrors([
+  body("fullName").trim().notEmpty().withMessage("Full name is required"),
+
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Email is required")
+    .isEmail()
+    .withMessage("Invalid email format")
+    .custom(async (email, { req }) => {
+      const existingUser = await User.findOne({ email });
+      if (existingUser && existingUser._id.toString() !== req.params.id) {
+        throw new BadRequestError("Email already exists");
+      }
+    }),
+
+  body("phoneNumber")
+    .trim()
+    .notEmpty()
+    .withMessage("Phone number is required")
+    .custom(async (phoneNumber, { req }) => {
+      const existingUser = await User.findOne({ phoneNumber });
+      if (existingUser && existingUser._id.toString() !== req.params.id) {
+        throw new BadRequestError("Phone number already exists");
+      }
+    }),
+
+  body("gender")
+    .isIn(["male", "female"])
+    .withMessage("Gender must be one of: male, female"),
+
+  body("designation").trim().notEmpty().withMessage("Designation is required"),
 ]);
 
 export const validateModuleInput = withValidationErrors([

@@ -12,7 +12,17 @@ export const addModule = async (req, res) => {
 };
 
 export const getAllModule = async (req, res) => {
-  const modules = await Module.find().populate({
+  const { search } = req.query;
+
+  const queryObject = {};
+  if (search && search.trim() !== "") {
+    queryObject.moduleName = {
+      $regex: search.trim(),
+      $options: "i",
+    };
+  }
+
+  const modules = await Module.find(queryObject).populate({
     path: "relatedCourse",
     populate: { path: "courseCategory" },
   });

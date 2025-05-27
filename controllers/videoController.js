@@ -40,7 +40,15 @@ export const addVideo = async (req, res) => {
 };
 
 export const getAllVideo = async (req, res) => {
-  const videos = await Video.find()
+  const { search } = req.query;
+  const queryObject = {};
+  if (search && search !== "") {
+    queryObject.videoName = {
+      $regex: search,
+      $options: "i",
+    };
+  }
+  const videos = await Video.find(queryObject)
     .populate("relatedModule", "moduleName")
     .populate("relatedCourse", "courseName");
 
@@ -67,10 +75,17 @@ export const updateVideos = async (req, res) => {
 
 export const getSingleVideo = async (req, res) => {
   const { id } = req.params;
-  const video = await Video.findById(id).populate(
-    "comments.user",
-    "firstName profilePicUrl"
-  );
+  const video = await Video.findById(id)
+    .populate({
+      path: "relatedCourse",
+      select: "courseName",
+      populate: {
+        path: "courseCategory",
+        select: "categoryName",
+      },
+    })
+    .populate("relatedModule", "moduleName")
+    .populate("comments.user", "firstName profilePicUrl");
   if (!video) throw new NotFoundError("videos not found");
   res.status(200).json(video);
 };

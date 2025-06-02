@@ -31,4 +31,3 @@ const ChatRoomSchema = new Schema(
 
 const ChatRoom = model("ChatRoom", ChatRoomSchema);
 export default ChatRoom;
-//comment

@@ -45,6 +45,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "https://api.tronacademy.in",
+  "https://admin.tronacademy.in",
 ];
 
 app.use(

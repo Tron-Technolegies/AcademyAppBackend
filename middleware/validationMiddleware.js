@@ -301,19 +301,5 @@ export const validateQuizInput = withValidationErrors([
   body("courseCategory").notEmpty().withMessage("Course category is required"),
   body("relatedCourse").notEmpty().withMessage("Related course is required"),
   body("relatedModule").notEmpty().withMessage("Related module is required"),
-  body("question").notEmpty().withMessage("question is required"),
-  body("answer").notEmpty().withMessage("Answer is required"),
-  body("options")
-    .notEmpty()
-    .withMessage("Options are required")
-    .custom((value) => {
-      const optionsArray = value
-        .split(",")
-        .map((o) => o.trim())
-        .filter(Boolean);
-      if (optionsArray.length < 2) {
-        throw new Error("Options must include at least two items");
-      }
-      return true;
-    }),
+  body("questions").notEmpty().withMessage("question is required"),
 ]);

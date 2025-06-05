@@ -8,9 +8,7 @@ export const addQuiz = async (req, res) => {
     courseCategory,
     relatedCourse,
     relatedModule,
-    question,
-    options,
-    answer,
+    questions,
   } = req.body;
 
   const newQuiz = new Quiz({
@@ -19,16 +17,11 @@ export const addQuiz = async (req, res) => {
     courseCategory,
     relatedCourse,
     relatedModule,
-    questions: [
-      {
-        question,
-        options,
-        answer,
-      },
-    ],
+    questions,
   });
+
   await newQuiz.save();
-  res.status(201).json({ message: "successfully created" });
+  res.status(201).json({ message: "Successfully created" });
 };
 
 export const getAllQuiz = async (req, res) => {
@@ -44,21 +37,11 @@ export const updateQuiz = async (req, res) => {
     courseCategory,
     relatedCourse,
     relatedModule,
-    question,
-    options,
-    answer,
+    questions,
   } = req.body;
   const { id } = req.params;
   const quiz = await Quiz.findById(id);
   if (!quiz) throw new NotFoundError("Quiz not found");
-
-  const questions = [
-    {
-      question,
-      options: options,
-      answer,
-    },
-  ];
 
   quiz.name = name;
   quiz.time = time;
@@ -68,7 +51,6 @@ export const updateQuiz = async (req, res) => {
   quiz.questions = questions;
 
   await quiz.save();
-
   res.status(200).json({ message: "Quiz updated successfully" });
 };
 
@@ -84,4 +66,18 @@ export const deleteQuiz = async (req, res) => {
   const quiz = await Quiz.findByIdAndDelete(id);
   if (!quiz) throw new NotFoundError("no quiz found");
   res.status(200).json({ message: "quiz deleted successfully" });
+};
+
+export const getQuizByCourse = async (req, res) => {
+  const { courseId } = req.query;
+  const quizzes = await Quiz.find({ relatedCourse: courseId });
+  if (!quizzes) throw new NotFoundError("quiz not found");
+  res.status(200).json(quizzes);
+};
+
+export const getQuizByModule = async (req, res) => {
+  const { moduleId } = req.query;
+  const quizzes = await Quiz.find({ relatedModule: moduleId });
+  if (!quizzes) throw new NotFoundError("quiz not found");
+  res.status(200).json(quizzes);
 };

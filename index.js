@@ -27,6 +27,7 @@ import planRouter from "./routes/planRouter.js";
 import paymentRouter from "./routes/paymentRouter.js";
 import chatRoomRouter from "./routes/chatRoomRouter.js";
 import adminRouter from "./routes/adminRouter.js";
+import quizRouter from "./routes/quizRouter.js";
 //custom middleware imports
 import errorHandlerMiddleware from "./middleware/errorHandlerMiddleware.js";
 import { authenticateUser } from "./middleware/authenticationMiddleware.js";
@@ -95,7 +96,8 @@ app.use("/api/v1/messages", authenticateUser, messageRouter);
 app.use("/api/v1/plan", authenticateUser, planRouter);
 app.use("/api/v1/payments", authenticateUser, paymentRouter);
 app.use("/api/v1/chatRoom", authenticateUser, chatRoomRouter);
-app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/admin", authenticateUser, adminRouter);
+app.use("/api/v1/quiz", authenticateUser, quizRouter);
 
 app.use("*", (req, res) => {
   res.status(404).json({ message: "not found" }); //this error will trigger when the request route do not match any of the above routes

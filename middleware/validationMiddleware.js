@@ -6,6 +6,7 @@ const withValidationErrors = (validateValues) => {
   return [
     validateValues,
     (req, res, next) => {
+      console.log("Incoming data:", req.body);
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         const errorMessages = errors.array().map((error) => error.msg);
@@ -288,4 +289,17 @@ export const validateChatRoomInput = withValidationErrors([
   body("relatedSubCommunity")
     .notEmpty()
     .withMessage("related sub-community is required"),
+]);
+
+export const validateQuizInput = withValidationErrors([
+  body("name").notEmpty().withMessage("Quiz name is required"),
+  body("time")
+    .notEmpty()
+    .withMessage("Time is required")
+    .isNumeric()
+    .withMessage("Time must be a number"),
+  body("courseCategory").notEmpty().withMessage("Course category is required"),
+  body("relatedCourse").notEmpty().withMessage("Related course is required"),
+  body("relatedModule").notEmpty().withMessage("Related module is required"),
+  body("questions").notEmpty().withMessage("question is required"),
 ]);

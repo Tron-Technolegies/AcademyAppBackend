@@ -81,3 +81,4 @@ export const getQuizByModule = async (req, res) => {
   if (!quizzes) throw new NotFoundError("quiz not found");
   res.status(200).json(quizzes);
 };
+//this is a comment

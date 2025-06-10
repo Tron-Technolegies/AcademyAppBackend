@@ -29,4 +29,3 @@ export const getUserStats = async (req, res, next) => {
     newUsers,
   });
 };
-//comment

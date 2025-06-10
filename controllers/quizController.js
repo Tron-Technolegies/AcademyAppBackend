@@ -1,5 +1,6 @@
 import { NotFoundError } from "../errors/customErrors.js";
 import Quiz from "../models/QuizModel.js";
+import QuizResult from "../models/QuizResultModel.js";
 
 export const addQuiz = async (req, res) => {
   const {
@@ -81,4 +82,93 @@ export const getQuizByModule = async (req, res) => {
   if (!quizzes) throw new NotFoundError("quiz not found");
   res.status(200).json(quizzes);
 };
-//this is a comment
+
+// export const calculateQuizScore = async (req, res) => {
+//   const { quizId, userAnswers } = req.body;
+//   const quiz = await Quiz.findById(quizId);
+//   if (!quiz) throw new NotFoundError("Quiz not found");
+
+//   const questions = quiz.questions;
+//   let correctAnswers = 0;
+
+//   questions.forEach((question, index) => {
+//     if (userAnswers[index] === question.answer) {
+//       correctAnswers++;
+//     }
+//   });
+
+//   const totalQuestions = questions.length;
+//   const scorePercentage = (correctAnswers / totalQuestions) * 100;
+
+//   res.status(200).json({
+//     correctAnswers,
+//     totalQuestions,
+//     scorePercentage,
+//   });
+// };
+
+// export const submitQuiz = async (req, res) => {
+//   const { quizId, userAnswers, timeTaken } = req.body;
+//   const { userId } = req.user.userId;
+
+//   // Fetch quiz with correct answers
+//   const quiz = await Quiz.findById(quizId);
+//   if (!quiz) throw new NotFoundError("Quiz not found");
+
+//   let correctAnswers = 0;
+//   const totalQuestions = quiz.questions.length;
+
+//   // Compare answers
+//   quiz.questions.forEach((question, index) => {
+//     if (userAnswers[index] === question.answer) {
+//       correctAnswers++;
+//     }
+//   });
+
+//   // Save the quiz result
+//   const newQuizResult = new QuizResult({
+//     user: userId,
+//     quiz: quizId,
+//     score: correctAnswers,
+//     totalQuestions,
+//     timeTaken,
+//   });
+
+//   await newQuizResult.save();
+//   res.status(201).json({
+//     message: "Quiz submitted successfully",
+//     score: correctAnswers,
+//     totalQuestions,
+//   });
+// };
+
+// export const calculateCourseScore = async (req, res) => {
+//   const { courseId } = req.body;
+//   const { userId } = req.user.userId;
+//   const quizzes = await Quiz.find({ relatedCourse: courseId });
+//   if (!quizzes) throw new NotFoundError("No quizzes found for this course");
+
+//   let totalCorrectAnswers = 0;
+//   let totalQuestionsAttempted = 0;
+
+//   for (const quiz of quizzes) {
+//     const quizResult = await QuizResult.findOne({
+//       user: userId,
+//       quiz: quiz._id,
+//     });
+//     if (quizResult) {
+//       totalCorrectAnswers += quizResult.score;
+//       totalQuestionsAttempted += quizResult.totalQuestions;
+//     }
+//   }
+//   const overallScorePercentage =
+//     totalQuestionsAttempted > 0
+//       ? (totalCorrectAnswers / totalQuestionsAttempted) * 100
+//       : 0;
+
+//   res.status(200).json({
+//     totalCorrectAnswers,
+//     totalQuestionsAttempted,
+//     overallScorePercentage,
+//   });
+// };

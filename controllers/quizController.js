@@ -26,7 +26,10 @@ export const addQuiz = async (req, res) => {
 };
 
 export const getAllQuiz = async (req, res) => {
-  const quiz = await Quiz.find();
+  const quiz = await Quiz.find()
+    .populate("relatedCourse", "courseName")
+    .populate("relatedModule", "moduleName")
+    .populate("courseCategory", "categoryName");
   if (!quiz) throw new NotFoundError("Quiz not found");
   res.status(200).json(quiz);
 };

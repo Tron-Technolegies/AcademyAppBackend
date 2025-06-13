@@ -8,7 +8,6 @@ import {
   getAllQuiz,
   getQuizByCourse,
   getQuizByModule,
-  getQuizResults,
   getSingleQuiz,
   submitQuizResult,
   updateQuiz,
@@ -26,10 +25,10 @@ router.get("/courseScore/:courseId", calculateCourseScore); //calculate score to
 router.post("/calculateScore/:id", calculateQuizScore);
 router.post("/submitResult", submitQuizResult);
 
-router.post("/", validateQuizInput, isAdmin, addQuiz);
-router.get("/", getAllQuiz);
-router.patch("/:id", validateQuizInput, isAdmin, updateQuiz);
-router.get("/:id", getSingleQuiz);
-router.delete("/:id", isAdmin, deleteQuiz);
+router.post("/addQuiz", validateQuizInput, isAdmin, addQuiz);
+router.get("/getAllQuiz", getAllQuiz);
+router.patch("/updateQuiz/:id", validateQuizInput, isAdmin, updateQuiz);
+router.get("/getQuiz/:id", getSingleQuiz);
+router.delete("/deleteQuiz/:id", isAdmin, deleteQuiz);
 
 export default router;

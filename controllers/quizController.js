@@ -60,7 +60,10 @@ export const updateQuiz = async (req, res) => {
 
 export const getSingleQuiz = async (req, res) => {
   const { id } = req.params;
-  const quiz = await Quiz.findById(id);
+  const quiz = await Quiz.findById(id)
+    .populate("relatedCourse")
+    .populate("relatedModule")
+    .populate("courseCategory");
   if (!quiz) throw new NotFoundError("quizzes not found");
   res.status(200).json(quiz);
 };

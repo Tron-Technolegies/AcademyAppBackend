@@ -16,7 +16,7 @@ const quizResultSchema = new Schema(
       type: Number,
     },
     timeTaken: {
-      type: Number, // in seconds
+      type: Number,
     },
     completedAt: {
       type: Date,

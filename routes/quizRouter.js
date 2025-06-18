@@ -6,6 +6,7 @@ import {
   calculateQuizScore,
   deleteQuiz,
   getAllQuiz,
+  getCourseLeaderboard,
   getQuizByCourse,
   getQuizByModule,
   getSingleQuiz,
@@ -20,10 +21,10 @@ const router = Router();
 router.get("/quizByCourse", getQuizByCourse);
 router.get("/quizByModule", getQuizByModule);
 router.get("/courseScore/:courseId", calculateCourseScore); //calculate score total modules in the course
-// router.get("/quizResults/:id", getQuizResults);
+router.get("/getLeaderBoard", getCourseLeaderboard);
 
 router.post("/calculateScore/:id", calculateQuizScore);
-router.post("/submitResult", submitQuizResult);
+router.post("/saveResult", submitQuizResult);
 
 router.post("/addQuiz", validateQuizInput, isAdmin, addQuiz);
 router.get("/getAllQuiz", getAllQuiz);

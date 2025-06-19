@@ -207,6 +207,21 @@ export const calculateCourseScore = async (req, res) => {
   });
 };
 
+export const checkQuizSubmission = async (req, res) => {
+  const { quizId } = req.query;
+  const userId = req.user.userId;
+
+  const quizResult = await QuizResult.findOne({
+    user: userId,
+    quiz: quizId,
+  });
+
+  res.status(200).json({
+    hasSubmitted: !!quizResult,
+    message: quizResult ? "Quiz already submitted" : "Quiz not yet submitted",
+  });
+};
+
 export const getCourseLeaderboard = async (req, res) => {
   const { courseId } = req.query;
 

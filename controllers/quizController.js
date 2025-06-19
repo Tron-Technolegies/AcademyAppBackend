@@ -220,14 +220,14 @@ export const getCourseLeaderboard = async (req, res) => {
   // Step 2: Get all results for those quizzes
   const results = await QuizResult.find({ quiz: { $in: quizIds } }).populate(
     "user",
-    "firstName lastName email profilePicUrl"
+    "firstName lastName profilePicUrl"
   );
 
   if (!results.length) {
     return res.status(404).json({ message: "No quiz results for this course" });
   }
 
-  // Step 3: Aggregate scores by user
+  // Step 3: Aggregate scores and timeTaken by user
   const userScores = {};
   results.forEach((result) => {
     const userId = result.user._id.toString();
@@ -236,18 +236,96 @@ export const getCourseLeaderboard = async (req, res) => {
         user: result.user,
         totalScore: 0,
         totalQuestions: 0,
+        totalTimeTaken: 0,
+        attempts: 0,
       };
     }
     userScores[userId].totalScore += result.score;
     userScores[userId].totalQuestions += result.totalQuestions;
+    userScores[userId].totalTimeTaken += result.timeTaken;
+    userScores[userId].attempts += 1;
   });
 
   // Step 4: Calculate weighted score and prepare leaderboard array
+  let leaderboard = Object.values(userScores).map((entry) => {
+    const accuracy =
+      entry.totalQuestions > 0 ? entry.totalScore / entry.totalQuestions : 0;
+    const weightedScore = accuracy * Math.log(entry.totalQuestions + 1);
+    const avgTimeTaken =
+      entry.attempts > 0 ? entry.totalTimeTaken / entry.attempts : 0;
+
+    return {
+      user: entry.user,
+      score: entry.totalScore,
+      total: entry.totalQuestions,
+      accuracy: (accuracy * 100).toFixed(2),
+      avgTimeTaken: avgTimeTaken.toFixed(2),
+      weightedScore,
+    };
+  });
+
+  // Step 5: Sort leaderboard by weightedScore
+  leaderboard.sort((a, b) => b.weightedScore - a.weightedScore);
+
+  // Step 6: Assign rank and clean up
+  leaderboard = leaderboard.map(({ weightedScore, ...entry }, index) => ({
+    ...entry,
+    rank: index + 1,
+  }));
+
+  // Step 7: Separate top 3
+  const top3 = leaderboard.slice(0, 3);
+
+  // Step 8: Send both top3 and full leaderboard
+  res.status(200).json({
+    courseId,
+    top3,
+    leaderboard, // full list, includes top 3
+  });
+};
+
+export const getLeaderboard = async (req, res) => {
+  // Step 1: Fetch all quizzes
+  const quizzes = await Quiz.find({});
+  if (!quizzes) return res.status(404).json({ message: "No quizzes found" });
+
+  const quizIds = quizzes.map((quiz) => quiz._id);
+
+  // Step 2: Get all quiz results, populate user data including profilePicUrl
+  const results = await QuizResult.find({ quiz: { $in: quizIds } }).populate(
+    "user",
+    "firstName lastName profilePicUrl"
+  );
+
+  if (!results)
+    return res.status(404).json({ message: "No quiz results found" });
+
+  // Step 3: Aggregate scores, questions, and time by user
+  const userScores = {};
+  results.forEach((result) => {
+    const userId = result.user._id.toString();
+    if (!userScores[userId]) {
+      userScores[userId] = {
+        user: result.user,
+        totalScore: 0,
+        totalQuestions: 0,
+        totalTimeTaken: 0,
+        attempts: 0,
+      };
+    }
+    userScores[userId].totalScore += result.score;
+    userScores[userId].totalQuestions += result.totalQuestions;
+    userScores[userId].totalTimeTaken += result.timeTaken || 0;
+    userScores[userId].attempts += 1;
+  });
+
+  // Step 4: Prepare leaderboard array
   const leaderboard = Object.values(userScores).map((entry) => {
     const accuracy =
       entry.totalQuestions > 0 ? entry.totalScore / entry.totalQuestions : 0;
-    // Weighted score formula (adjust the log base or multiplier if needed)
     const weightedScore = accuracy * Math.log(entry.totalQuestions + 1);
+    const averageTime =
+      entry.attempts > 0 ? entry.totalTimeTaken / entry.attempts : 0;
 
     return {
       user: entry.user,
@@ -255,16 +333,30 @@ export const getCourseLeaderboard = async (req, res) => {
       total: entry.totalQuestions,
       weightedScore,
       accuracy: (accuracy * 100).toFixed(2),
+      averageTime: averageTime.toFixed(2),
     };
   });
 
-  // Step 5: Sort by weighted score descending
-  leaderboard.sort((a, b) => b.weightedScore - a.weightedScore);
+  // Step 5: Sort by weighted score, then average time
+  leaderboard.sort((a, b) => {
+    if (b.weightedScore === a.weightedScore) {
+      return a.averageTime - b.averageTime;
+    }
+    return b.weightedScore - a.weightedScore;
+  });
 
-  // Optionally remove weightedScore from output if you want cleaner response
+  // Step 6: Assign ranks
+  leaderboard.forEach((entry, index) => {
+    entry.rank = index + 1;
+  });
+
+  // Step 7: Get top 3 users
+  const top3 = leaderboard.slice(0, 3);
+
+  // Step 8: Clean final leaderboard (omit weightedScore)
   const cleanLeaderboard = leaderboard.map(
     ({ weightedScore, ...rest }) => rest
   );
 
-  res.status(200).json({ courseId, leaderboard: cleanLeaderboard });
+  res.status(200).json({ top3, leaderboard: cleanLeaderboard });
 };

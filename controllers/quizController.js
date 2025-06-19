@@ -220,7 +220,7 @@ export const getCourseLeaderboard = async (req, res) => {
   // Step 2: Get all results for those quizzes
   const results = await QuizResult.find({ quiz: { $in: quizIds } }).populate(
     "user",
-    "firstName lastName email profilePicUrl"
+    "firstName lastName profilePicUrl"
   );
 
   if (!results.length) {

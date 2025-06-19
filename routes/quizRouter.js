@@ -20,7 +20,7 @@ const router = Router();
 
 router.get("/quizByCourse", getQuizByCourse);
 router.get("/quizByModule", getQuizByModule);
-router.get("/courseScore/:courseId", calculateCourseScore); //calculate score total modules in the course
+router.get("/courseScore", calculateCourseScore); //calculate score total modules in the course
 router.get("/getLeaderBoard", getCourseLeaderboard);
 
 router.post("/calculateScore/:id", calculateQuizScore);

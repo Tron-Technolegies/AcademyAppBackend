@@ -117,6 +117,18 @@ export const submitQuizResult = async (req, res) => {
   const { quizId, userAnswers, timeTaken } = req.body;
   const userId = req.user.userId;
 
+  // Check if user already attempted this quiz
+  const alreadySubmitted = await QuizResult.findOne({
+    user: userId,
+    quiz: quizId,
+  });
+  if (alreadySubmitted) {
+    return res.status(400).json({
+      message:
+        "You have already submitted this quiz. Only one attempt is allowed.",
+    });
+  }
+
   // Fetch quiz with correct answers
   const quiz = await Quiz.findById(quizId);
   if (!quiz) throw new NotFoundError("Quiz not found");
@@ -144,6 +156,7 @@ export const submitQuizResult = async (req, res) => {
   });
 
   await newQuizResult.save();
+
   res.status(201).json({
     message: "Quiz submitted successfully",
     score: correctAnswers,
@@ -153,7 +166,7 @@ export const submitQuizResult = async (req, res) => {
 };
 
 export const calculateCourseScore = async (req, res) => {
-  const { courseId } = req.params;
+  const { courseId } = req.query;
   const userId = req.user.userId;
 
   // Find all quizzes related to the course (includes all modules)
@@ -207,7 +220,7 @@ export const getCourseLeaderboard = async (req, res) => {
   // Step 2: Get all results for those quizzes
   const results = await QuizResult.find({ quiz: { $in: quizIds } }).populate(
     "user",
-    "name email"
+    "firstName lastName email profilePicUrl"
   );
 
   if (!results.length) {

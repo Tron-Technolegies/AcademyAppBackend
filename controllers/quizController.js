@@ -60,7 +60,10 @@ export const updateQuiz = async (req, res) => {
 
 export const getSingleQuiz = async (req, res) => {
   const { id } = req.params;
-  const quiz = await Quiz.findById(id);
+  const quiz = await Quiz.findById(id)
+    .populate("relatedCourse")
+    .populate("relatedModule")
+    .populate("courseCategory");
   if (!quiz) throw new NotFoundError("quizzes not found");
   res.status(200).json(quiz);
 };
@@ -190,14 +193,65 @@ export const calculateCourseScore = async (req, res) => {
     overallScorePercentage,
   });
 };
-// export const getQuizResults = async (req, res) => {
-//   const userId = req.user.userId;
 
-//   const results = await QuizResult.find({ user: userId }).populate("quiz");
+export const getCourseLeaderboard = async (req, res) => {
+  const { courseId } = req.query;
 
-//   if (!results.length) {
-//     return res.status(404).json({ message: "No quiz results found" });
-//   }
+  // Step 1: Find all quizzes for the course
+  const quizzes = await Quiz.find({ relatedCourse: courseId });
+  if (!quizzes.length)
+    throw new NotFoundError("No quizzes found for this course");
 
-//   res.status(200).json(results);
-// };
+  const quizIds = quizzes.map((quiz) => quiz._id);
+
+  // Step 2: Get all results for those quizzes
+  const results = await QuizResult.find({ quiz: { $in: quizIds } }).populate(
+    "user",
+    "name email"
+  );
+
+  if (!results.length) {
+    return res.status(404).json({ message: "No quiz results for this course" });
+  }
+
+  // Step 3: Aggregate scores by user
+  const userScores = {};
+  results.forEach((result) => {
+    const userId = result.user._id.toString();
+    if (!userScores[userId]) {
+      userScores[userId] = {
+        user: result.user,
+        totalScore: 0,
+        totalQuestions: 0,
+      };
+    }
+    userScores[userId].totalScore += result.score;
+    userScores[userId].totalQuestions += result.totalQuestions;
+  });
+
+  // Step 4: Calculate weighted score and prepare leaderboard array
+  const leaderboard = Object.values(userScores).map((entry) => {
+    const accuracy =
+      entry.totalQuestions > 0 ? entry.totalScore / entry.totalQuestions : 0;
+    // Weighted score formula (adjust the log base or multiplier if needed)
+    const weightedScore = accuracy * Math.log(entry.totalQuestions + 1);
+
+    return {
+      user: entry.user,
+      score: entry.totalScore,
+      total: entry.totalQuestions,
+      weightedScore,
+      accuracy: (accuracy * 100).toFixed(2),
+    };
+  });
+
+  // Step 5: Sort by weighted score descending
+  leaderboard.sort((a, b) => b.weightedScore - a.weightedScore);
+
+  // Optionally remove weightedScore from output if you want cleaner response
+  const cleanLeaderboard = leaderboard.map(
+    ({ weightedScore, ...rest }) => rest
+  );
+
+  res.status(200).json({ courseId, leaderboard: cleanLeaderboard });
+};

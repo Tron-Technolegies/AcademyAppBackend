@@ -4,6 +4,7 @@ import {
   addQuiz,
   calculateCourseScore,
   calculateQuizScore,
+  checkQuizSubmission,
   deleteQuiz,
   getAllQuiz,
   getCourseLeaderboard,
@@ -24,6 +25,7 @@ router.get("/quizByModule", getQuizByModule);
 router.get("/courseScore", calculateCourseScore);
 router.get("/getLeaderBoard", getCourseLeaderboard);
 router.get("/getOverAllLeaderBoard", getLeaderboard);
+router.get("/checkSubmission", checkQuizSubmission);
 
 router.post("/calculateScore/:id", calculateQuizScore);
 router.post("/saveResult", submitQuizResult);

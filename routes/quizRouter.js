@@ -11,6 +11,7 @@ import {
   getLeaderboard,
   getQuizByCourse,
   getQuizByModule,
+  getQuizzesByModuleStatus,
   getSingleQuiz,
   submitQuizResult,
   updateQuiz,
@@ -26,6 +27,7 @@ router.get("/courseScore", calculateCourseScore);
 router.get("/getLeaderBoard", getCourseLeaderboard);
 router.get("/getOverAllLeaderBoard", getLeaderboard);
 router.get("/checkSubmission", checkQuizSubmission);
+router.get("/getStatus", getQuizzesByModuleStatus);
 
 router.post("/calculateScore/:id", calculateQuizScore);
 router.post("/saveResult", submitQuizResult);

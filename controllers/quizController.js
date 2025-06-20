@@ -375,3 +375,55 @@ export const getLeaderboard = async (req, res) => {
 
   res.status(200).json({ top3, leaderboard: cleanLeaderboard });
 };
+
+export const getQuizzesByModuleStatus = async (req, res) => {
+  const userId = req.user.userId;
+  const { moduleId } = req.query;
+
+  if (!moduleId)
+    return res.status(400).json({ message: "moduleId is required" });
+
+  // Fetch all quizzes for the given module
+  const allQuizzes = await Quiz.find({ relatedModule: moduleId })
+    .populate("relatedCourse", "courseName")
+    .populate("relatedModule", "moduleName")
+    .populate("courseCategory", "categoryName");
+
+  if (!allQuizzes) throw new NotFoundError("No quizzes found for this module");
+
+  // Fetch quiz results for the user in this module
+  const completedResults = await QuizResult.find({ user: userId }).populate({
+    path: "quiz",
+    match: { relatedModule: moduleId },
+  });
+
+  // Filter out quiz results with no quiz (null due to mismatch in match)
+  const filteredResults = completedResults.filter(
+    (result) => result.quiz !== null
+  );
+
+  // Extract quiz IDs from completed results
+  const completedQuizIds = filteredResults.map((result) =>
+    result.quiz._id.toString()
+  );
+
+  // Separate completed and uncompleted quizzes
+  const completedQuizzes = filteredResults.map((result) => {
+    return {
+      quiz: result.quiz,
+      score: result.score,
+      totalQuestions: result.totalQuestions,
+      timeTaken: result.timeTaken,
+      resultId: result._id,
+    };
+  });
+
+  const uncompletedQuizzes = allQuizzes.filter(
+    (quiz) => !completedQuizIds.includes(quiz._id.toString())
+  );
+
+  res.status(200).json({
+    completedQuizzes,
+    uncompletedQuizzes,
+  });
+};

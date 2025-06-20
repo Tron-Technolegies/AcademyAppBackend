@@ -418,12 +418,12 @@ export const getQuizzesByModuleStatus = async (req, res) => {
     };
   });
 
-  const uncompletedQuizzes = allQuizzes.filter(
+  const incompleteQuizzes = allQuizzes.filter(
     (quiz) => !completedQuizIds.includes(quiz._id.toString())
   );
 
   res.status(200).json({
     completedQuizzes,
-    uncompletedQuizzes,
+    incompleteQuizzes,
   });
 };

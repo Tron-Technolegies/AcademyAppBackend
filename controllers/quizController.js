@@ -424,6 +424,6 @@ export const getQuizzesByModuleStatus = async (req, res) => {
 
   res.status(200).json({
     completedQuizzes,
-    incompletedQuizzes,
+    uncompletedQuizzes,
   });
 };

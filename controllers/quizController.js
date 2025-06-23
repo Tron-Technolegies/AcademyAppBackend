@@ -299,7 +299,7 @@ export const getCourseLeaderboard = async (req, res) => {
   });
 };
 
-export const getLeaderboard = async (req, res) => {
+export const getLeaderboard = async (req, res, startDate) => {
   // Step 1: Fetch all quizzes
   const quizzes = await Quiz.find({});
   if (!quizzes) return res.status(404).json({ message: "No quizzes found" });
@@ -307,10 +307,10 @@ export const getLeaderboard = async (req, res) => {
   const quizIds = quizzes.map((quiz) => quiz._id);
 
   // Step 2: Get all quiz results, populate user data including profilePicUrl
-  const results = await QuizResult.find({ quiz: { $in: quizIds } }).populate(
-    "user",
-    "firstName lastName profilePicUrl"
-  );
+  const results = await QuizResult.find({
+    quiz: { $in: quizIds },
+    createdAt: { $gte: startDate },
+  }).populate("user", "firstName lastName profilePicUrl");
 
   if (!results)
     return res.status(404).json({ message: "No quiz results found" });
@@ -426,4 +426,136 @@ export const getQuizzesByModuleStatus = async (req, res) => {
     completedQuizzes,
     incompleteQuizzes,
   });
+};
+
+export const getLeaderboardByTimeFrame = async (req, res) => {
+  const { timeFrame } = req.params; // expecting "daily", "weekly", or "monthly"
+  const now = new Date();
+  let startDate;
+
+  switch (timeFrame) {
+    case "daily":
+      startDate = new Date(now);
+      startDate.setHours(0, 0, 0, 0); // start of today
+      break;
+
+    case "weekly":
+      const dayOfWeek = now.getDay(); // Sunday=0
+      startDate = new Date(now);
+      startDate.setHours(0, 0, 0, 0);
+      startDate.setDate(now.getDate() - dayOfWeek); // start of this week (Sunday)
+      break;
+
+    case "monthly":
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1); // first day of this month
+      break;
+
+    default:
+      return res.status(400).json({ message: "Invalid time frame" });
+  }
+
+  await getLeaderboard(req, res, startDate);
+};
+
+// export const getLeaderboard = async (req, res) => {
+//   // Step 1: Fetch all quizzes
+//   const quizzes = await Quiz.find({});
+//   if (!quizzes) return res.status(404).json({ message: "No quizzes found" });
+
+//   const quizIds = quizzes.map((quiz) => quiz._id);
+
+//   // Step 2: Get all quiz results, populate user data including profilePicUrl
+//   const results = await QuizResult.find({ quiz: { $in: quizIds } }).populate(
+//     "user",
+//     "firstName lastName profilePicUrl"
+//   );
+
+//   if (!results)
+//     return res.status(404).json({ message: "No quiz results found" });
+
+//   // Step 3: Aggregate scores, questions, and time by user
+//   const userScores = {};
+//   results.forEach((result) => {
+//     const userId = result.user._id.toString();
+//     if (!userScores[userId]) {
+//       userScores[userId] = {
+//         user: result.user,
+//         totalScore: 0,
+//         totalQuestions: 0,
+//         totalTimeTaken: 0,
+//         attempts: 0,
+//       };
+//     }
+//     userScores[userId].totalScore += result.score;
+//     userScores[userId].totalQuestions += result.totalQuestions;
+//     userScores[userId].totalTimeTaken += result.timeTaken || 0;
+//     userScores[userId].attempts += 1;
+//   });
+
+//   // Step 4: Prepare leaderboard array
+//   const leaderboard = Object.values(userScores).map((entry) => {
+//     const accuracy =
+//       entry.totalQuestions > 0 ? entry.totalScore / entry.totalQuestions : 0;
+//     const weightedScore = accuracy * Math.log(entry.totalQuestions + 1);
+//     const averageTime =
+//       entry.attempts > 0 ? entry.totalTimeTaken / entry.attempts : 0;
+
+//     return {
+//       user: entry.user,
+//       score: entry.totalScore,
+//       total: entry.totalQuestions,
+//       weightedScore,
+//       accuracy: (accuracy * 100).toFixed(2),
+//       averageTime: averageTime.toFixed(2),
+//     };
+//   });
+
+//   // Step 5: Sort by weighted score, then average time
+//   leaderboard.sort((a, b) => {
+//     if (b.weightedScore === a.weightedScore) {
+//       return a.averageTime - b.averageTime;
+//     }
+//     return b.weightedScore - a.weightedScore;
+//   });
+
+//   // Step 6: Assign ranks
+//   leaderboard.forEach((entry, index) => {
+//     entry.rank = index + 1;
+//   });
+
+//   // Step 7: Get top 3 users
+//   const top3 = leaderboard.slice(0, 3);
+
+//   // Step 8: Clean final leaderboard (omit weightedScore)
+//   const cleanLeaderboard = leaderboard.map(
+//     ({ weightedScore, ...rest }) => rest
+//   );
+
+//   res.status(200).json({ top3, leaderboard: cleanLeaderboard });
+// };
+
+export const getByPeriod = async (req, res) => {
+  const { period } = req.params;
+  const now = new Date();
+  let startDate;
+
+  switch (period) {
+    case "daily":
+      startDate = new Date(now);
+      startDate.setHours(0, 0, 0, 0);
+      break;
+    case "weekly":
+      const dayOfWeek = now.getDay();
+      startDate = new Date(now);
+      startDate.setHours(0, 0, 0, 0);
+      startDate.setDate(now.getDate() - dayOfWeek);
+      break;
+    case "monthly":
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      break;
+    default:
+      return res.status(400).json({ message: "Invalid period parameter" });
+  }
+
+  await getLeaderboard(req, res, startDate);
 };

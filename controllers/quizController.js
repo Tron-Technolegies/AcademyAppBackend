@@ -26,7 +26,9 @@ export const addQuiz = async (req, res) => {
 };
 
 export const getAllQuiz = async (req, res) => {
-  const quiz = await Quiz.find()
+  const { search = "" } = req.query;
+  const filter = search ? { name: { $regex: search, $options: "i" } } : {};
+  const quiz = await Quiz.find(filter)
     .populate("relatedCourse", "courseName")
     .populate("relatedModule", "moduleName")
     .populate("courseCategory", "categoryName");

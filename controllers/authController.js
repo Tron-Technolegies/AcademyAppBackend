@@ -9,6 +9,8 @@ import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { createJWT } from "../utils/jwtUtils.js";
 import { sendMail, transporter } from "../utils/nodemailer.js";
 import FaceCompare from "../utils/faceCompare.js";
+
+import { OAuth2Client } from "google-auth-library";
 // import { compareFaces, loadModels } from "../utils/faceModel.js";
 
 export const registerUser = async (req, res) => {
@@ -243,4 +245,31 @@ export const logoutAdmin = async (req, res) => {
     expires: new Date(Date.now()),
   });
   res.status(200).json({ message: "successfully logged out" });
+};
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+export const googleLogin = async (req, res) => {
+  const { idToken } = req.body;
+  if (!idToken) throw new BadRequestError("No token provided");
+
+  const ticket = await googleClient.verifyIdToken({
+    idToken,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  const payload = ticket.getPayload();
+  const { email, sub: googleId } = payload;
+
+  let user = await User.findOne({ email });
+  if (!user) {
+    user = new User({ email, password: googleId });
+    await user.save();
+  }
+
+  const token = createJWT({ userId: user._id, role: user.role });
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+  });
+  res.status(200).json({ message: "Google sign-in successful", token });
 };

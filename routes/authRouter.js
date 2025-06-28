@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   // compareFace,
   forgotPassword,
+  googleLogin,
   // faceRecognition,
   loginUser,
   logout,
@@ -39,5 +40,6 @@ router.post("/forgotPassword/:id", validateResetPasswordInput, resetPassword);
 router.post("/registerFace", authenticateUser, registerFace);
 router.post("/verifyFace", authenticateUser, verifyFace);
 router.post("/resendOtp", validateResendOtpInput, resendOtp);
+router.post("/googleLogin", googleLogin);
 
 export default router;

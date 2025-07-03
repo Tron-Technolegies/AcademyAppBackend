@@ -65,3 +65,5 @@ export const getSubCommunityByCommunity = async (req, res) => {
   if (!subCommunity) throw new NotFoundError("community not found");
   res.status(200).json(subCommunity);
 };
+
+//subcomuunity

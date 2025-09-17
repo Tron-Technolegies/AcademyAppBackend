@@ -42,10 +42,10 @@ export const registerUser = async (req, res) => {
   await sendMail(transporter, mailOptions);
 
   const token = createJWT({ userId: newUser._id, role: newUser.role }); //created token using the newly created users id and role as payload
-  const tenDay = 1000 * 60 * 60 * 24 * 10;
+  const thirtyDays = 1000 * 60 * 60 * 24 * 30;
   res.cookie("token", token, {
     httpOnly: true,
-    expires: new Date(Date.now() + tenDay),
+    expires: new Date(Date.now() + thirtyDays),
     secure: process.env.NODE_ENV === "production",
   });
   res.status(201).json({
@@ -61,10 +61,10 @@ export const loginUser = async (req, res) => {
   const isMatch = await comparePassword(password, user.password);
   if (!isMatch) throw new BadRequestError("Invalid credentials");
   const token = createJWT({ userId: user._id, role: user.role }); //created token using the newly created users id and role as payload
-  const tenDay = 1000 * 60 * 60 * 24 * 10;
+  const thirtyDays = 1000 * 60 * 60 * 24 * 30;
   res.cookie("token", token, {
     httpOnly: true,
-    expires: new Date(Date.now() + tenDay),
+    expires: new Date(Date.now() + thirtyDays),
     secure: process.env.NODE_ENV === "production",
   });
   res.status(201).json({

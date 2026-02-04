@@ -4,6 +4,7 @@ import {
   addToHistory,
   addUserDetails,
   clearHistory,
+  deleteUser,
   getAllHistory,
   getAllSavedVideo,
   getAllUser,
@@ -40,4 +41,5 @@ router.get("/getAllSavedVideo", getAllSavedVideo);
 router.get("/getAllHistory", getAllHistory);
 router.patch("/subscription", validatePlanInput, managePlan);
 router.get("/getAllUser", getAllUser);
+router.delete("/deleteUser", deleteUser);
 export default router;

@@ -184,3 +184,15 @@ export const getAllUser = async (req, res) => {
   if (!students) throw new NotFoundError("students not found");
   res.status(200).json(students);
 };
+
+export const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.user.userId);
+    if (!user) throw new NotFoundError("No user found");
+    res.status(200).json({ message: "successfully deleted " });
+  } catch (error) {
+    res
+      .status(error.statusCode || 500)
+      .json({ error: error.message || error.msg });
+  }
+};

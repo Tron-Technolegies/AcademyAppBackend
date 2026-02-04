@@ -9,6 +9,8 @@ import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { createJWT } from "../utils/jwtUtils.js";
 import { sendMail, transporter } from "../utils/nodemailer.js";
 import FaceCompare from "../utils/faceCompare.js";
+
+import { OAuth2Client } from "google-auth-library";
 // import { compareFaces, loadModels } from "../utils/faceModel.js";
 
 export const registerUser = async (req, res) => {
@@ -40,10 +42,10 @@ export const registerUser = async (req, res) => {
   await sendMail(transporter, mailOptions);
 
   const token = createJWT({ userId: newUser._id, role: newUser.role }); //created token using the newly created users id and role as payload
-  const tenDay = 1000 * 60 * 60 * 24 * 10;
+  const thirtyDays = 1000 * 60 * 60 * 24 * 30;
   res.cookie("token", token, {
     httpOnly: true,
-    expires: new Date(Date.now() + tenDay),
+    expires: new Date(Date.now() + thirtyDays),
     secure: process.env.NODE_ENV === "production",
   });
   res.status(201).json({
@@ -59,10 +61,10 @@ export const loginUser = async (req, res) => {
   const isMatch = await comparePassword(password, user.password);
   if (!isMatch) throw new BadRequestError("Invalid credentials");
   const token = createJWT({ userId: user._id, role: user.role }); //created token using the newly created users id and role as payload
-  const tenDay = 1000 * 60 * 60 * 24 * 10;
+  const thirtyDays = 1000 * 60 * 60 * 24 * 30;
   res.cookie("token", token, {
     httpOnly: true,
-    expires: new Date(Date.now() + tenDay),
+    expires: new Date(Date.now() + thirtyDays),
     secure: process.env.NODE_ENV === "production",
   });
   res.status(201).json({
@@ -243,4 +245,31 @@ export const logoutAdmin = async (req, res) => {
     expires: new Date(Date.now()),
   });
   res.status(200).json({ message: "successfully logged out" });
+};
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+export const googleLogin = async (req, res) => {
+  const { idToken } = req.body;
+  if (!idToken) throw new BadRequestError("No token provided");
+
+  const ticket = await googleClient.verifyIdToken({
+    idToken,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  const payload = ticket.getPayload();
+  const { email, sub: googleId } = payload;
+
+  let user = await User.findOne({ email });
+  if (!user) {
+    user = new User({ email, password: googleId });
+    await user.save();
+  }
+
+  const token = createJWT({ userId: user._id, role: user.role });
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+  });
+  res.status(200).json({ message: "Google sign-in successful", token });
 };

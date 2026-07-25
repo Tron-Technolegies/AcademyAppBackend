@@ -67,7 +67,6 @@ io.on("connection", (socket) => {
         message,
         type: "text",
         timestamp: newMessage.createdAt,
-        zz,
       });
     } catch (error) {
       console.error("Error sending message:", error);

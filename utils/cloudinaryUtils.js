@@ -2,7 +2,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { Readable } from "stream";
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  cloud_name: process.env.CLOUDINARY_CLOUDNAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
@@ -10,7 +10,7 @@ cloudinary.config({
 const uploadToCloudinary = async (
   buffer,
   resourceType = "auto",
-  folder = "chat_media"
+  folder = "chat_media",
 ) => {
   try {
     // Create a promise wrapper around the upload_stream callback
@@ -20,7 +20,7 @@ const uploadToCloudinary = async (
         (error, result) => {
           if (error) reject(error);
           else resolve(result);
-        }
+        },
       );
 
       // Convert buffer to readable stream and pipe to Cloudinary

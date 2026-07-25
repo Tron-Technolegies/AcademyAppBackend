@@ -11,12 +11,14 @@ const CommunitySchema = new Schema(
         ref: "User",
       },
     ],
-    subCommunities: {
-      type: mongoose.Types.ObjectId,
-      ref: "SubCommunity",
-    },
+    subCommunities: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "SubCommunity",
+      },
+    ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Community = model("Community", CommunitySchema);

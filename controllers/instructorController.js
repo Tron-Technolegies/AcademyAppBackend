@@ -1,4 +1,3 @@
-import Instructor from "../models/InstructorModel.js";
 import { NotFoundError } from "../errors/customErrors.js";
 import User from "../models/UserModel.js";
 import { hashPassword } from "../utils/bcrypt.js";
@@ -12,6 +11,7 @@ export const addInstructor = async (req, res) => {
     password: hashedPassword,
     phoneNumber: phoneNumber,
     gender: gender,
+    firstName: fullName,
     role: "teacher",
     instructorDetails: {
       instructorName: fullName,

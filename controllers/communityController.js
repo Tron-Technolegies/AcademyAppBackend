@@ -12,7 +12,10 @@ export const addCommunity = async (req, res) => {
 };
 
 export const getAllCommunity = async (req, res) => {
-  const communities = await Community.find();
+  const communities = await Community.find().populate(
+    "communityMembers",
+    "profilePicUrl firstName email",
+  );
   if (!communities) throw new NotFoundError("community not found");
   res.status(200).json(communities);
 };

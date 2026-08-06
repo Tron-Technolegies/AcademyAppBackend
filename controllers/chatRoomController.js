@@ -1,7 +1,9 @@
 import ChatRoom from "../models/ChatRoomModel.js";
-import { NotFoundError } from "../errors/customErrors.js";
+import { BadRequestError, NotFoundError } from "../errors/customErrors.js";
 import SubCommunity from "../models/SubCommunity.js";
 import Community from "../models/CommunityModel.js";
+import ChatRoomRead from "../models/ChatRoomReadModel.js";
+import Message from "../models/MessageModel.js";
 
 export const addChatRoom = async (req, res) => {
   const { chatRoomName, relatedCommunity, relatedSubCommunity } = req.body;
@@ -73,4 +75,38 @@ export const getChatRoomBySubCommunity = async (req, res) => {
   const chatRoom = await ChatRoom.find({ relatedSubCommunity: subCommunityId });
   if (!chatRoom) throw new NotFoundError("no chat room found");
   res.status(200).json(chatRoom);
+};
+
+export const getUnreadCounts = async (req, res) => {
+  try {
+    const { userId, chatRoomIds } = req.query;
+    if (!userId || !chatRoomIds) {
+      throw new BadRequestError("User Id and chatRoomIds are required");
+    }
+    const roomIds = chatRoomIds.split(",");
+    const reads = await ChatRoomRead.find({
+      userId,
+      chatRoomId: { $in: roomIds },
+    });
+    const lastReadMap = {};
+    reads.forEach((r) => {
+      lastReadMap[r.chatRoomId.toString()] = r.lastReadAt;
+    });
+    const counts = {};
+    await Promise.all(
+      roomIds.map(async (roomId) => {
+        const since = lastReadMap[roomId] || new Date(0);
+        counts[roomId] = await Message.countDocuments({
+          chatRoomId: roomId,
+          createdAt: { $gt: since },
+          user: { $ne: userId },
+        });
+      }),
+    );
+    res.status(200).json(counts);
+  } catch (error) {
+    res
+      .status(error.statusCode || 500)
+      .json({ error: error.message || error.msg });
+  }
 };

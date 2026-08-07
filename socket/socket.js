@@ -54,7 +54,7 @@ io.on("connection", (socket) => {
 
       const messages = await Message.find({ chatRoomId })
         .populate("user")
-        .sort({ timeStamp: 1 });
+        .sort({ createdAt: 1, _id: 1 });
 
       const readRecord = userId
         ? await ChatRoomRead.findOne({ userId, chatRoomId })

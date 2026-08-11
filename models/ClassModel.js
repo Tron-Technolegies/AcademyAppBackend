@@ -12,14 +12,29 @@ const ClassSchema = new Schema(
       type: String,
     },
     instructor: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
     course: {
       type: mongoose.Types.ObjectId,
       ref: "Course",
     },
+    notes: {
+      type: String,
+    },
+    sessionStatus: {
+      type: String,
+      enum: ["scheduled", "live", "ended"],
+      default: "scheduled",
+    },
+    startedAt: {
+      type: Date,
+    },
+    endedAt: {
+      type: Date,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Class = model("Class", ClassSchema);

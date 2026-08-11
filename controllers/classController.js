@@ -1,7 +1,11 @@
 import pkg from "agora-access-token";
 const { RtcTokenBuilder, RtcRole } = pkg;
 
-import { NotFoundError } from "../errors/customErrors.js";
+import {
+  BadRequestError,
+  NotFoundError,
+  UnauthorizedError,
+} from "../errors/customErrors.js";
 import Class from "../models/ClassModel.js";
 import User from "../models/UserModel.js";
 import generateAgoraToken, { uidHash } from "../utils/agora/agoraToken.js";
@@ -87,34 +91,87 @@ export const deleteClass = async (req, res) => {
 //   res.json({ token, channelName });
 // };
 
-export const joinClassSession = async (req, res) => {
-  const { id } = req.params;
-  const userId = req.user.userId;
+export const startClassSession = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.user;
 
-  if (!userId) {
-    return res.status(400).json({
-      error: "User ID is required in request body",
-      requiredFields: { userId: "string" },
-    });
+    const classSession = await Class.findById(id);
+    if (!classSession) throw new NotFoundError("Class Not found");
+
+    if (classSession.instructor.toString() !== userId) {
+      throw new UnauthorizedError(
+        "Only the Assigned instructor can start this class",
+      );
+    }
+
+    classSession.sessionStatus = "live";
+    classSession.startedAt = new Date();
+    await classSession.save();
+    res.status(200).json({ message: "class started" });
+  } catch (error) {
+    res
+      .status(error.statusCode || 500)
+      .json({ message: error.msg || error.message });
   }
+};
 
-  const [user, classSession] = await Promise.all([
-    User.findById(userId).select("_id role").lean(),
-    Class.findById(id).select("_id").lean(),
-  ]);
+export const endClassSession = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.user;
 
-  if (!user) throw new NotFoundError("User not found");
-  if (!classSession) throw new NotFoundError("Class not found");
+    const classSession = await Class.findById(id);
+    if (!classSession) throw new NotFoundError("Class Not found");
 
-  const channelName = `class-${classSession._id}`;
-  const token = generateAgoraToken(channelName, user._id.toString(), user.role);
+    if (classSession.instructor.toString() !== userId) {
+      throw new UnauthorizedError("Only assigned instructor can end the class");
+    }
+    classSession.sessionStatus = "ended";
+    classSession.endedAt = new Date();
+    await classSession.save();
+    res.status(200).json({ message: "session ended" });
+  } catch (error) {
+    res
+      .status(error.statusCode || 500)
+      .json({ message: error.msg || error.message });
+  }
+};
 
-  res.status(200).json({
-    token,
-    channelName,
-    uid: uidHash(user._id.toString()),
-    role: user.role,
-    classId: classSession._id,
-    expiresIn: 3600,
-  });
+export const joinClassSession = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.user;
+
+    const [user, classSession] = await Promise.all([
+      User.findById(userId).select("_id role").lean(),
+      Class.findById(id).select("_id instructor sessionStatus").lean(),
+    ]);
+
+    if (!user) throw new NotFoundError("User not found");
+    if (!classSession) throw new NotFoundError("Class not found");
+
+    const isInstructor = classSession.instructor.toString() === userId;
+    if (!isInstructor && classSession.sessionStatus !== "live") {
+      throw new BadRequestError("Class has not started yet");
+    }
+
+    const channelName = `class-${classSession._id}`;
+    const account = user._id.toString();
+    const token = generateAgoraToken(channelName, account, user.role);
+
+    res.status(200).json({
+      token,
+      channelName,
+      account,
+      role: user.role,
+      classId: classSession._id,
+      sessionStatus: classSession.sessionStatus,
+      expiresIn: 3600,
+    });
+  } catch (error) {
+    res
+      .status(error.statusCode || 500)
+      .json({ message: error.msg || error.message });
+  }
 };

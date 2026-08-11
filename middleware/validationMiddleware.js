@@ -32,7 +32,7 @@ export const validateRegisterInput = withValidationErrors([
     .withMessage("password must be at least 8 characters long")
     .matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]+$/)
     .withMessage(
-      "password must contain at least one letter,one number, and can include special characters"
+      "password must contain at least one letter,one number, and can include special characters",
     ),
   body("email")
     .notEmpty()
@@ -209,7 +209,7 @@ export const validateClassInput = withValidationErrors([
   body("date").notEmpty().withMessage("date is required"),
   body("time").notEmpty().withMessage("time is required"),
   body("instructor").notEmpty().withMessage("instructor is required"),
-  body("course").notEmpty().withMessage("course is requires "),
+  body("course").notEmpty().withMessage("course is required "),
 ]);
 
 export const validateSaveVideoInput = withValidationErrors([

@@ -170,3 +170,16 @@ export const getAllEnrolledStudents = async (req, res) => {
       .json({ error: error.msg || error.message });
   }
 };
+
+export const getAllCoursesByInstructor = async (req, res) => {
+  try {
+    const courses = await Course.find({ instructor: req.user.userId })
+      .select("courseName")
+      .lean();
+    res.status(200).json(courses);
+  } catch (error) {
+    res
+      .status(error.statusCode || 500)
+      .json({ error: error.msg || error.message });
+  }
+};

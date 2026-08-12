@@ -11,14 +11,15 @@ import User from "../models/UserModel.js";
 import generateAgoraToken, { uidHash } from "../utils/agora/agoraToken.js";
 
 export const addClass = async (req, res) => {
-  const { className, date, time, instructor, course } = req.body;
+  const { className, date, time, instructor, course, notes } = req.body;
   const [day, month, year] = date.split("/");
   const newClass = new Class({
     className,
-    date: new Date(`${year}-${month}-${day}T00:00:00Z`),
+    date: new Date(date),
     time,
     instructor,
     course,
+    notes: notes || "",
   });
   await newClass.save();
   res.status(201).json({ message: "successfully created" });
@@ -28,6 +29,33 @@ export const getAllClass = async (req, res) => {
   const classes = await Class.find();
   if (!classes) throw new NotFoundError("classes not found");
   res.status(200).json(classes);
+};
+
+export const getClassByInstructor = async (req, res) => {
+  const { currentPage, search } = req.query;
+  try {
+    const page = Number(currentPage) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+    const queryObject = { instructor: req.user.userId };
+    if (search && search.trim() !== "") {
+      queryObject.className = { $regex: search, $options: "i" };
+    }
+    const classes = await Class.find(queryObject)
+      .sort({ date: 1 })
+      .skip(skip)
+      .limit(limit);
+    const totalClasses = await Class.countDocuments(queryObject);
+    res.status(200).json({
+      classes,
+      totalClasses,
+      totalPages: Math.ceil(totalClasses / limit),
+    });
+  } catch (error) {
+    res
+      .status(error.statusCode || 500)
+      .json({ message: error.msg || error.message });
+  }
 };
 
 export const updateClass = async (req, res) => {

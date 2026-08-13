@@ -20,7 +20,7 @@ export const getUserStats = async (req, res, next) => {
   const newUsers = await User.find({
     createdAt: { $gte: thirtyDaysAgo },
     role: "student",
-  }).select("firstName username phoneNumber createdAt");
+  }).select("firstName lastName email phoneNumber createdAt");
 
   return res.status(200).json({
     newUserCount,

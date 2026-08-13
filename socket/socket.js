@@ -7,6 +7,7 @@ import { v2 as cloudinary } from "cloudinary";
 import uploadToCloudinary from "../utils/cloudinaryUtils.js";
 import { formatChatImage } from "../middleware/multerMiddleware.js";
 import { Buffer } from "buffer";
+import ChatRoomRead from "../models/ChatRoomReadModel.js";
 
 const storage = multer.memoryStorage();
 const upload = multer({
@@ -31,19 +32,69 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log("a user connected: ", socket.id);
 
-  socket.on("joinChatRoom", async (chatRoomId) => {
+  // socket.on("joinChatRoom", async (chatRoomId) => {
+  //   try {
+  //     socket.join(chatRoomId);
+  //     console.log(`User ${socket.id} joined chat room ${chatRoomId}`);
+
+  //     const messages = await Message.find({ chatRoomId })
+  //       .populate("user")
+  //       .sort({ timeStamp: 1 });
+
+  //     socket.emit("previousMessages", messages);
+  //   } catch (error) {
+  //     console.error("Error joining chat room:", error);
+  //     socket.emit("error", "Failed to join chat room");
+  //   }
+  // });
+  socket.on("joinChatRoom", async ({ chatRoomId, userId }) => {
     try {
       socket.join(chatRoomId);
       console.log(`User ${socket.id} joined chat room ${chatRoomId}`);
 
       const messages = await Message.find({ chatRoomId })
         .populate("user")
-        .sort({ timeStamp: 1 });
+        .sort({ createdAt: 1, _id: 1 });
 
-      socket.emit("previousMessages", messages);
+      const readRecord = userId
+        ? await ChatRoomRead.findOne({ userId, chatRoomId })
+        : null;
+
+      socket.emit("previousMessages", {
+        messages,
+        lastReadMessageId: readRecord?.lastReadMessageId?.toString() || null,
+      });
     } catch (error) {
       console.error("Error joining chat room:", error);
       socket.emit("error", "Failed to join chat room");
+    }
+  });
+
+  // Lightweight join for rooms NOT currently open — just so this socket
+  // receives receiveMessage broadcasts for badge purposes, without the
+  // cost of fetching full message history.
+
+  socket.on("subscribeRooms", (chatRoomIds = []) => {
+    chatRoomIds.forEach((id) => socket.join(id));
+  });
+
+  socket.on("unsubscribeRooms", (chatRoomIds = []) => {
+    chatRoomIds.forEach((id) => socket.leave(id));
+  });
+
+  socket.on("markAsRead", async ({ chatRoomId, userId, lastMessageId }) => {
+    try {
+      if (!chatRoomId || !userId || !lastMessageId) return;
+      await ChatRoomRead.findOneAndUpdate(
+        {
+          userId,
+          chatRoomId,
+        },
+        { lastReadMessageId: lastMessageId, lastReadAt: new Date() },
+        { upsert: true },
+      );
+    } catch (error) {
+      console.error("Error marking as read:", error);
     }
   });
 
@@ -58,16 +109,16 @@ io.on("connection", (socket) => {
         type: "text",
       });
       await newMessage.save();
+      await newMessage.populate("user");
       console.log("Message saved:", newMessage);
 
       // Broadcast message to all in the sub-community
       io.to(chatRoomId).emit("receiveMessage", {
         _id: newMessage._id,
-        user,
+        user: newMessage.user,
         message,
         type: "text",
         timestamp: newMessage.createdAt,
-        zz,
       });
     } catch (error) {
       console.error("Error sending message:", error);
@@ -94,12 +145,13 @@ io.on("connection", (socket) => {
         type: "image",
       });
       await newMessage.save();
+      await newMessage.populate("user");
       console.log(result.secure_url);
 
       // Broadcast image message
       io.to(chatRoomId).emit("receiveMessage", {
         _id: newMessage._id,
-        user,
+        user: newMessage.user,
         imageUrl: result.secure_url,
         type: "image",
         timestamp: newMessage.createdAt,
@@ -131,10 +183,11 @@ io.on("connection", (socket) => {
       });
 
       await newMessage.save();
+      await newMessage.populate("user");
 
       io.to(chatRoomId).emit("receiveMessage", {
         _id: newMessage._id,
-        user,
+        user: newMessage.user,
         audioUrl: result.secure_url,
         type: "audio",
         timestamp: newMessage.createdAt,
@@ -168,10 +221,10 @@ io.on("connection", (socket) => {
       });
 
       await newMessage.save();
-
+      await newMessage.populate("user");
       io.to(chatRoomId).emit("receiveMessage", {
         _id: newMessage._id,
-        user,
+        user: newMessage.user,
         fileUrl: result.secure_url,
         fileName,
         type: "file",

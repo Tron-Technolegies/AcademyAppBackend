@@ -7,7 +7,7 @@ export const addPlan = async (req, res) => {
   const newPlan = new Plan({
     planName: planName,
     price: price,
-    features: features,
+    features: featuresArray,
   });
   await newPlan.save();
   res.status(201).json({ message: "successfully created" });
@@ -26,7 +26,7 @@ export const updatePlan = async (req, res) => {
   if (!plan) throw new NotFoundError("plan not found");
   plan.planName = planName;
   plan.price = price;
-  plan.features = features;
+  plan.features = features.split(",");
   await plan.save();
   res.status(200).json({ message: "plan is updated" });
 };

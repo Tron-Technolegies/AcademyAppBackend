@@ -168,11 +168,11 @@ const UserSchema = new Schema(
       },
     ],
 
-    instructorDetails: [InstructorSchema],
+    instructorDetails: InstructorSchema,
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const User = model("User", UserSchema);

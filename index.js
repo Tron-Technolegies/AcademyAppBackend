@@ -64,12 +64,12 @@ app.use(
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // Ensure all necessary methods are allowed
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  })
+  }),
 );
 app.post(
   "/api/v1/payments/webhook",
   express.raw({ type: "application/json" }),
-  stripeWebHook
+  stripeWebHook,
 );
 app.use(bodyParser.json({ limit: "1mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));

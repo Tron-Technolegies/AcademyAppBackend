@@ -6,6 +6,8 @@ import {
 import {
   addInstructor,
   deleteInstructor,
+  getAllCoursesByInstructor,
+  getAllEnrolledStudents,
   getAllInstructor,
   getSingleInstructor,
   updateInstructor,
@@ -19,8 +21,10 @@ router.patch(
   "/updateInstructor/:id",
   validateUpdateInstructorInput,
   isAdmin,
-  updateInstructor
+  updateInstructor,
 );
 router.get("/getInstructor/:id", getSingleInstructor);
 router.delete("/deleteInstructor/:id", deleteInstructor);
+router.get("/getAllEnrolled", getAllEnrolledStudents);
+router.get("/getCoursesByInstructor", getAllCoursesByInstructor);
 export default router;

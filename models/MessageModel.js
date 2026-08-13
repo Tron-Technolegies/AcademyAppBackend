@@ -39,7 +39,7 @@ const MessageSchema = new Schema(
       ref: ChatRoom,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Message = model("Message", MessageSchema);

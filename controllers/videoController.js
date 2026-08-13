@@ -98,7 +98,7 @@ export const deleteVideo = async (req, res) => {
   if (!module) throw new NotFoundError("No Module found");
   const allVideos = module.AllVideos;
   const newVideos = allVideos.filter(
-    (video) => video.toString() !== video._id.toString()
+    (videoId) => videoId.toString() !== id.toString()
   );
   module.AllVideos = newVideos;
   await module.save();

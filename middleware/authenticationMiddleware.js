@@ -24,18 +24,22 @@ export const authenticateUser = async (req, res, next) => {
     if (user.subscriptionType === "subscriber") {
       const today = new Date();
       if (user.subscriptionEndDate < today) {
-        user.subscriptionType === "free-user";
+        user.subscriptionType = "free-user";
         await user.save();
       }
     }
     if (user.subscriptionType === "free-trial") {
       const today = new Date();
       if (user.freeTrialEnd < today) {
-        user.subscriptionType === "free-user";
+        user.subscriptionType = "free-user";
         await user.save();
       }
     }
-    req.user = { userId: userId, role: role };
+    req.user = {
+      userId: userId,
+      role: role,
+      subscriptionType: user?.subscriptionType || "free-user",
+    };
     next();
   } catch (error) {
     console.log(error);

@@ -12,7 +12,7 @@ const CourseSchema = new Schema(
     },
     instructor: {
       type: mongoose.Types.ObjectId,
-      ref: "Instructor",
+      ref: "User",
     },
     courseRating: {
       type: Number,

@@ -6,6 +6,7 @@ import {
   getChatRoomByCommunity,
   getChatRoomBySubCommunity,
   getSingleChatRoom,
+  getUnreadCounts,
   updateChatRoom,
 } from "../controllers/chatRoomController.js";
 import { isAdmin } from "../middleware/authenticationMiddleware.js";
@@ -19,11 +20,12 @@ router.patch(
   "/updateAllChatRoom/:id",
   isAdmin,
   validateChatRoomInput,
-  updateChatRoom
+  updateChatRoom,
 );
 router.get("/getSingleChatRoom/:id", getSingleChatRoom);
 router.delete("/deleteChatRoom/:id", isAdmin, deleteChatRoom);
 router.get("/byCommunity", getChatRoomByCommunity);
 router.get("/bySubCommunity", getChatRoomBySubCommunity);
+router.get("/unreadCounts", getUnreadCounts);
 
 export default router;

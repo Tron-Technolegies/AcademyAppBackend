@@ -42,6 +42,7 @@ export const getClassByInstructor = async (req, res) => {
       queryObject.className = { $regex: search, $options: "i" };
     }
     const classes = await Class.find(queryObject)
+      .populate("course", "courseName")
       .sort({ date: 1 })
       .skip(skip)
       .limit(limit);
@@ -196,6 +197,57 @@ export const joinClassSession = async (req, res) => {
       classId: classSession._id,
       sessionStatus: classSession.sessionStatus,
       expiresIn: 3600,
+    });
+  } catch (error) {
+    res
+      .status(error.statusCode || 500)
+      .json({ message: error.msg || error.message });
+  }
+};
+
+export const getClassesOfStudent = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const { currentPage } = req.query;
+    const student = await User.findById(userId).select(
+      "enrolledCourses.course",
+    );
+    if (!student) {
+      throw new NotFoundError("No student found");
+    }
+    const courseIds = student.enrolledCourses.map((ec) => ec.course);
+
+    if (!courseIds.length) {
+      return res
+        .status(200)
+        .json({ classes: [], totalPage: 1, totalClasses: 0 });
+    }
+    const queryObject = {
+      course: { $in: courseIds },
+      sessionStatus: { $in: ["scheduled", "live"] },
+    };
+    const page = Number(currentPage) || 1;
+    const limit = 20;
+    const skip = (page - 1) * limit;
+
+    const [classes, totalCount] = await Promise.all([
+      Class.find(queryObject)
+        .populate(
+          "instructor",
+          "firstName lastName profilePicUrl instructorDetails",
+        )
+        .populate("course", "courseName")
+        .sort({ date: 1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Class.countDocuments(queryObject),
+    ]);
+
+    res.status(200).json({
+      classes: classes,
+      totalPages: Math.ceil(totalCount / limit),
+      totalClasses: totalCount,
     });
   } catch (error) {
     res

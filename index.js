@@ -47,6 +47,7 @@ const allowedOrigins = [
   "http://localhost:5174",
   "https://api.tronacademy.in",
   "https://admin.tronacademy.in",
+  "https://webapp.tronacademy.in",
   "https://com.org.tron_academy",
   "app://com.org.tron_academy",
 ];

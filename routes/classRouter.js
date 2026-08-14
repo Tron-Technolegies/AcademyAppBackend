@@ -7,6 +7,7 @@ import {
   endClassSession,
   getAllClass,
   getClassByInstructor,
+  getClassesOfStudent,
   getSingleClass,
   joinClassSession,
   startClassSession,
@@ -17,6 +18,7 @@ const router = Router();
 router.post("/addClass", validateClassInput, addClass);
 router.get("/getAllClass", getAllClass);
 router.get("/getClassByInstructor", getClassByInstructor);
+router.get("/studentClasses", getClassesOfStudent);
 router.patch("/updateClass/:id", validateClassInput, updateClass);
 router.get("/getAllClass/:id", getSingleClass);
 router.delete("/deleteClass/:id", deleteClass);
